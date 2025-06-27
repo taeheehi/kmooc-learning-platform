@@ -8,8 +8,8 @@
         </a>
         <!-- 오른쪽 사용자 메뉴 -->
         <div style="display: flex; align-items: center; gap: 15px; padding-right: 30px;">
-            <a th:if="${user == null}" th:href="@{/login}" style="color: #4169e1;">로그인</a>
-            <a th:if="${user == null}" th:href="@{/register}" style="color: #4169e1;">회원가입</a>
+            <a th:if="${user == null}" th:href="@{/login}" class="header-link">로그인</a>
+            <a th:if="${user == null}" th:href="@{/register}" class="header-link">회원가입</a>
             <span th:if="${user != null}"
                   th:text="${user.role == 'STUDENT' ? '학습자' : (user.role == 'INSTRUCTOR' ? '강의자' : (user.role == 'ADMIN' ? '관리자' : ''))} + ' ' + ${user.name} + '님'"
                   style="margin-right: 10px;"></span>
@@ -26,8 +26,8 @@
                     <a href="#">학습자</a>
                     <ul class="submenu">
                         <li><a href="/recommend">강의 추천</a></li>
-                        <li><a href="/path">나만의 경로</a></li>
                         <li><a href="/chatbot">AI 챗봇</a></li>
+                        <li><a href="/path">나만의 경로</a></li>
                         <li><a href="/mycourses">내 강의실</a></li>
                     </ul>
                 </li>
@@ -62,7 +62,8 @@
     <style>
         body {
             margin: 0;
-            background-color: #f7f7f7; /* 공통 배경색 */
+            background-color: #f7f7f7;
+            font-family: Arial, sans-serif;
         }
         header {
             width: 100%;
@@ -109,7 +110,7 @@
         .submenu li a {
             display: block;
             padding: 10px 20px;
-            color: #333;
+            color: #4169e1;
             text-decoration: none;
             font-size: 0.95rem;
             transition: background-color 0.2s ease;
@@ -117,9 +118,17 @@
         /* Hover 효과 */
         .submenu li a:hover {
             background-color: #f0f0f0;
+            color: #4169e1;    /* Hover 시에도 동일 색상 유지 */
+            
         }
         nav ul > li:hover .submenu {
             display: block;
         }
+        .header-link {
+            color: #4169e1 !important;
+            font-weight: bold;
+            text-decoration: none !important;
+        }
     </style>
+    <link rel="stylesheet" href="/css/header.css">
 </div>

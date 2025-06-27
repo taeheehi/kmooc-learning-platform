@@ -1,119 +1,31 @@
+/* 공통 스타일 예시 */
 body {
-  font-family: 'Noto Sans KR', sans-serif;
-  margin: 0;
-  background: #f5f6fa;
+    margin: 0;
+    background-color: #f7f7f7;
+    font-family: Arial, sans-serif;
 }
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 32px 40px 16px 40px;
-  background: #fff;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.logo {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: #22223b;
-}
-
-.user-menu a {
-  margin-left: 24px;
-  color: #3a5aef;
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 1.05rem;
-}
-.user-menu a:hover {
-  text-decoration: underline;
-}
-
-.main-nav {
-  background: #fff;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 0 40px;
-}
-.main-nav ul {
-  display: flex;
-  justify-content: center;
-  gap: 80px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
-.main-nav li {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 180px;
-}
-.main-nav span {
-  font-weight: 700;
-  font-size: 1.1rem;
-  margin-bottom: 0;
-  color: #22223b;
-  border-bottom: 2px solid #e5e7eb;
-  padding-bottom: 4px;
-  width: 100%;
-  text-align: center;
-  cursor: pointer;
-  padding: 8px 0;
-}
-.main-nav .submenu {
-  display: none;
-  flex-direction: column;
-  gap: 6px;
-  position: absolute;
-  top: 38px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #fff;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  border-radius: 8px;
-  min-width: 160px;
-  padding: 12px 0;
-  z-index: 10;
-}
-.main-nav li:hover .submenu {
-  display: flex;
-}
-.main-nav a {
-  color: #3a5aef;
-  text-decoration: none;
-  font-size: 1rem;
-  text-align: center;
-  margin: 0;
-  padding: 7px 0;
-  transition: background 0.15s;
-  border-radius: 4px;
-}
-.main-nav .submenu a:hover {
-  background: #f5f6fa;
-  text-decoration: underline;
-}
-
-main {
-  padding: 40px;
-  background: #f5f6fa;
-  min-height: 400px;
-}
-
-h1, h2 {
-  color: #2c3e50;
+header, nav {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 a {
-  color: #2980b9;
-  text-decoration: none;
-  font-weight: bold;
+    color: #4169e1;
+    text-decoration: none;
 }
 
-form input, form select, form button {
-  display: block;
-  margin: 10px 0;
-  padding: 8px;
+button {
+    background-color: #4169e1;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px 24px;
 }
+
+/* 기타 공통적으로 반복되는 스타일만 유지 */ 

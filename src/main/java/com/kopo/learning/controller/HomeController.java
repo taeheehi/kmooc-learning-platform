@@ -1,6 +1,6 @@
 package com.kopo.learning.controller;
 
-import com.kopo.learning.User;
+import com.kopo.learning.model.User;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

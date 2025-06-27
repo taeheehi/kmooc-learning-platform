@@ -2,8 +2,8 @@ package com.kopo.learning.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import com.kopo.learning.User;
-import com.kopo.learning.UserRepository;
+import com.kopo.learning.model.User;
+import com.kopo.learning.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,11 +22,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import com.kopo.learning.service.UserService;
 
 @Controller
 public class UserController {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/mypage")
     public String mypage(HttpSession session, Model model) {
@@ -51,37 +55,15 @@ public class UserController {
         if (sessionUser == null) return "redirect:/login";
         User user = userRepository.findById(sessionUser.getId());
         if (user == null) return "redirect:/login";
-        // 기존 비밀번호 확인
-        if (!user.getPassword().equals(oldPassword)) {
+        User updated = userService.updateUser(user, name, oldPassword, newPassword, phone, email, gender, birth);
+        if (updated == null) {
             model.addAttribute("msg", "기존 비밀번호가 일치하지 않습니다.");
             model.addAttribute("user", user);
             return "mypage";
         }
-        String phoneNormalized = (phone == null) ? null : phone.replaceAll("-", "");
-        // 본인 제외 중복 체크
-        if (phoneNormalized != null && !phoneNormalized.equals(user.getPhone()) && userRepository.existsByPhone(phoneNormalized)) {
-            model.addAttribute("msg", "이미 등록된 핸드폰 번호입니다.");
-            model.addAttribute("user", user);
-            return "mypage";
-        }
-        if (email != null && !email.equals(user.getEmail()) && userRepository.existsByEmail(email)) {
-            model.addAttribute("msg", "이미 등록된 이메일입니다.");
-            model.addAttribute("user", user);
-            return "mypage";
-        }
-        user.setName(name);
-        user.setPhone(phoneNormalized);
-        user.setEmail(email);
-        if (gender != null) user.setGender(gender);
-        if (birth != null && !birth.isEmpty()) user.setBirth(LocalDate.parse(birth));
-        if (newPassword != null && !newPassword.isEmpty()) {
-            user.setPassword(newPassword);
-        }
-        user.setUpdatedAt(LocalDateTime.now());
-        userRepository.save(user);
-        session.setAttribute("user", user);
+        session.setAttribute("user", updated);
         model.addAttribute("msg", "정보가 성공적으로 수정되었습니다.");
-        model.addAttribute("user", user);
+        model.addAttribute("user", updated);
         return "mypage";
     }
 
@@ -157,6 +139,4 @@ public class UserController {
                 .contentType(MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream"))
                 .body(resource);
     }
-    
-    // 사용자 정보(마이페이지) 관련 기능
 } 
