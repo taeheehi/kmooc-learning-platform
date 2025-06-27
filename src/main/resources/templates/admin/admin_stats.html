@@ -1,1 +1,234 @@
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>통계</title><link rel="stylesheet" href="/css/admin/admin_stats.css"></head><body><h1>통계 페이지</h1></body></html> 
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원 통계</title>
+    <link rel="stylesheet" href="/css/admin/admin_stats.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f7f6; }
+        .container { width: 90%; margin: 20px auto; }
+        .kpi-cards { display: flex; justify-content: space-around; gap: 20px; margin-bottom: 40px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; flex-grow: 1; }
+        .card h3 { margin-top: 0; }
+        .card .value { font-size: 2.5em; font-weight: bold; }
+        .chart-container { display: flex; gap: 40px; margin-bottom: 40px; }
+        .chart-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 50%; }
+        .stats-table { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f8f8f8; }
+        .period-filter { margin-bottom: 15px; text-align: right; }
+        .period-filter button { border: 1px solid #ddd; background: #f9f9f9; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
+        .period-filter button.active { background: #36A2EB; color: white; border-color: #36A2EB; }
+    </style>
+</head>
+<body>
+<div th:replace="~{header :: header}"></div>
+
+<div class="container">
+    <h1>회원 통계</h1>
+
+    <!-- 상단: KPI 카드 -->
+    <div class="kpi-cards">
+        <div class="card">
+            <h3>총 회원 수</h3>
+            <div class="value" th:text="${totalUsers}">0</div>
+        </div>
+        <div class="card">
+            <h3>오늘 가입자 수</h3>
+            <div class="value" th:text="${todaySignups}">0</div>
+        </div>
+        <div class="card">
+            <h3>활성 회원(30일)</h3>
+            <div class="value" th:text="${activeStatusUsers}">0</div>
+        </div>
+        <div class="card">
+            <h3>휴면 회원</h3>
+            <div class="value" th:text="${dormantUsers}">0</div>
+        </div>
+    </div>
+
+    <!-- 중단: 차트 -->
+    <div class="chart-container">
+        <div class="chart-box" style="width: 65%;">
+            <h3>24시간 접속 트렌드</h3>
+            <canvas id="hourlyLoginChart"></canvas>
+        </div>
+        <div class="chart-box" style="width: 35%;">
+            <h3>역할별 회원 분포</h3>
+            <canvas id="roleChart"></canvas>
+        </div>
+    </div>
+    <div class="chart-container">
+        <div class="chart-box" style="width: 65%;">
+            <h3>기간별 신규 가입자</h3>
+            <div class="period-filter">
+                <button th:classappend="${#strings.equals(param.period, '7days') or param.period == null} ? 'active'" onclick="location.href='/admin/stats?period=7days'">최근 7일</button>
+                <button th:classappend="${#strings.equals(param.period, '30days')} ? 'active'" onclick="location.href='/admin/stats?period=30days'">최근 1개월</button>
+                <button th:classappend="${#strings.equals(param.period, 'year')} ? 'active'" onclick="location.href='/admin/stats?period=year'">올해</button>
+            </div>
+            <canvas id="signupTrendChart"></canvas>
+        </div>
+        <div class="chart-box" style="width: 35%;">
+            <h3>사용자 통계</h3>
+            <table>
+                <thead>
+                <tr>
+                    <th>항목</th>
+                    <th>분류</th>
+                    <th>사용자 수</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="entry, iterStat : ${genderCounts}">
+                    <td th:if="${iterStat.first}" th:rowspan="${iterStat.size}" style="vertical-align: middle; text-align: center;">성별</td>
+                    <td th:text="${iterStat.index == 0 ? '여성' : '남성'}"></td>
+                    <td th:text="${entry.value}"></td>
+                </tr>
+                <tr th:each="entry, iterStat : ${ageGroupCounts}">
+                    <td th:if="${iterStat.first}" th:rowspan="${iterStat.size}" style="vertical-align: middle; text-align: center;">연령대</td>
+                    <td th:text="${entry.key}"></td>
+                    <td th:text="${entry.value}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 하단: 성별/연령대별 통계 -->
+    <!--
+    <div class="stats-table">
+        <h3>인구 통계</h3>
+        <table>
+            ...
+        </table>
+    </div>
+    -->
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    // 1. 역할별 분포 (파이 차트)
+    const roleCtx = document.getElementById('roleChart').getContext('2d');
+    const roleData = /*[[${roleCounts}]]*/ {};
+
+    const roleLabels = {
+        'STUDENT': '학습자',
+        'INSTRUCTOR': '강의자',
+        'ADMIN': '관리자'
+    };
+    const translatedLabels = Object.keys(roleData).map(key => roleLabels[key] || key);
+
+    new Chart(roleCtx, {
+        type: 'pie',
+        data: {
+            labels: translatedLabels,
+            datasets: [{
+                label: '역할별 회원 수',
+                data: Object.values(roleData),
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+            }]
+        },
+        options: {
+            plugins: {
+                datalabels: {
+                    color: '#222',
+                    font: { weight: 'bold', size: 16 },
+                    formatter: function(value, context) {
+                        return value + '명';
+                    }
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+
+    // 2. 24시간 접속 트렌드 (선 그래프)
+    const hourlyLoginCtx = document.getElementById('hourlyLoginChart').getContext('2d');
+    const hourlyLoginData = /*[[${hourlyLogins}]]*/ {};
+    new Chart(hourlyLoginCtx, {
+        type: 'line',
+        data: {
+            labels: Object.keys(hourlyLoginData).map(h => h + '시'),
+            datasets: [{
+                label: '시간대별 접속자 수',
+                data: Object.values(hourlyLoginData),
+                fill: true,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // 3. 기간별 신규 가입자 + 휴면 전환자 (막대+꺾은선 그래프)
+    const signupTrendCtx = document.getElementById('signupTrendChart').getContext('2d');
+    const signupTrendData = /*[[${signupTrendData}]]*/ {};
+    const signupDormantTrendData = /*[[${signupDormantTrendData}]]*/ {};
+    new Chart(signupTrendCtx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(signupTrendData),
+            datasets: [
+                {
+                    label: '신규 가입자 수',
+                    data: Object.values(signupTrendData),
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    yAxisID: 'y',
+                    type: 'bar'
+                },
+                {
+                    label: '휴면 전환자 수',
+                    data: Object.values(signupDormantTrendData),
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    type: 'line',
+                    yAxisID: 'y1',
+                    tension: 0.2,
+                    fill: false,
+                    pointRadius: 4
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    position: 'left',
+                    title: { display: true, text: '신규 가입자' }
+                },
+                y1: {
+                    beginAtZero: true,
+                    position: 'right',
+                    grid: { drawOnChartArea: false },
+                    title: { display: true, text: '휴면 전환자' }
+                }
+            }
+        }
+    });
+
+    /*]]>*/
+</script>
+
+</body>
+</html> 
