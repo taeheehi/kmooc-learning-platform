@@ -1,19 +1,20 @@
 <div th:fragment="header">
-    <header style="border-bottom: 1px solid #eee; padding: 15px 20px; background-color: #fff; display: flex; justify-content: space-between; align-items: center;">
+    <header style="width: 100%; background-color: #fff; padding: 20px 40px; border-bottom: 1px solid #eee; box-shadow: 0 2px 4px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
         <!-- 왼쪽 로고 -->
-        <div style="font-size: 1.8rem; font-weight: bold; color: #222;">
+        <a th:href="@{/}" style="text-decoration: none; color: inherit;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: #222;">
             K-MOOC 강의 추천 플랫폼
-        </div>
+          </div>
+        </a>
         <!-- 오른쪽 사용자 메뉴 -->
-        <div style="display: flex; align-items: center; font-size: 0.95rem;">
+        <div style="display: flex; align-items: center; gap: 15px; padding-right: 30px;">
+            <a th:if="${user == null}" th:href="@{/login}" style="color: #4169e1;">로그인</a>
+            <a th:if="${user == null}" th:href="@{/register}" style="color: #4169e1;">회원가입</a>
             <span th:if="${user != null}"
                   th:text="${user.role == 'STUDENT' ? '학습자' : (user.role == 'INSTRUCTOR' ? '강의자' : (user.role == 'ADMIN' ? '관리자' : ''))} + ' ' + ${user.name} + '님'"
-                  style="margin-right: 15px;"></span>
-            <a th:if="${user != null}" th:href="@{/mypage}" style="color: #4169e1; margin-right: 10px;">마이페이지</a>
+                  style="margin-right: 10px;"></span>
+            <a th:if="${user != null}" th:href="@{/mypage}" style="color: #4169e1;">마이페이지</a>
             <a th:if="${user != null}" th:href="@{/logout}" style="color: #4169e1;">로그아웃</a>
-
-            <a th:if="${user == null}" th:href="@{/login}" style="color: #4169e1; margin-right: 10px;">로그인</a>
-            <a th:if="${user == null}" th:href="@{/register}" style="color: #4169e1;">회원가입</a>
         </div>
     </header>
 
@@ -59,25 +60,63 @@
     </nav>
 
     <style>
+        body {
+            margin: 0;
+            background-color: #f7f7f7; /* 공통 배경색 */
+        }
+        header {
+            width: 100%;
+            background-color: #fff;
+            padding: 20px 40px;
+            border-bottom: 1px solid #eee;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+        .main-nav {
+            background-color: #fff;
+            border-bottom: 1px solid #eee;
+        }
+        .content-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+        }
         nav ul li a {
             color: #222;
             text-decoration: none;
             padding: 10px 20px;
             display: block;
         }
+        /* 서브메뉴 박스 스타일 */
         .submenu {
             display: none;
             position: absolute;
             top: 100%;
             left: 0;
             background: #fff;
-            min-width: 160px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            min-width: 180px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 4px;
+            padding: 8px 0;
             z-index: 10;
         }
+        /* 서브메뉴 아이템 기본 스타일 제거 */
         .submenu li {
+            list-style: none;     /* ○ 마커 제거 */
             margin: 0;
             font-weight: normal;
+        }
+        /* 서브메뉴 링크 스타일링 */
+        .submenu li a {
+            display: block;
+            padding: 10px 20px;
+            color: #333;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: background-color 0.2s ease;
+        }
+        /* Hover 효과 */
+        .submenu li a:hover {
+            background-color: #f0f0f0;
         }
         nav ul > li:hover .submenu {
             display: block;
