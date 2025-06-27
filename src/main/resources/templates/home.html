@@ -1,64 +1,14 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>K-MOOC 강의 추천 시스템</title>
     <link rel="stylesheet" href="/css/common.css">
 </head>
 <body>
-    <header>
-        <div class="logo">K-MOOC 강의 추천 플랫폼</div>
-        <nav class="user-menu">
-            <th:block th:if="${session.user == null}">
-                <a href="/login">로그인</a>
-                <a href="/register">회원가입</a>
-            </th:block>
-            <th:block th:if="${session.user != null}">
-                <span th:text="${session.user.role} + ' ' + ${session.user.name} + '님'"></span>
-                <a href="/mypage">마이페이지</a>
-                <a href="/logout">로그아웃</a>
-            </th:block>
-        </nav>
-    </header>
-    <nav class="main-nav">
-        <ul>
-            <li>
-                <span>학습자</span>
-                <div class="submenu">
-                    <a href="/recommend">강의 추천</a>
-                    <a href="/path">나만의 경로</a>
-                    <a href="/chatbot">AI 챗봇</a>
-                    <a href="/mycourses">내 강의실</a>
-                </div>
-            </li>
-            <li>
-                <span>강의자</span>
-                <div class="submenu">
-                    <a href="/course/add">강의 등록</a>
-                    <a href="/course/manage">강의 관리</a>
-                    <a href="/course/students">수강생 확인</a>
-                </div>
-            </li>
-            <li>
-                <span>관리자</span>
-                <div class="submenu">
-                    <a href="/admin/users">회원 관리</a>
-                    <a href="/admin/stats">통계 확인</a>
-                </div>
-            </li>
-            <li>
-                <span>커뮤니티</span>
-                <div class="submenu">
-                    <a href="/notice">공지사항</a>
-                    <a href="/qna">질문게시판</a>
-                    <a href="/review">수강후기</a>
-                    <a href="/board">자유게시판</a>
-                </div>
-            </li>
-        </ul>
-    </nav>
+    <div th:replace="~{header :: header}"></div>
     <main>
         <!-- 메인 컨텐츠 영역 -->
     </main>
 </body>
-</html> 
+</html>
