@@ -80,12 +80,29 @@ public class AuthController {
             model.addAttribute("msg", "이미 등록된 이메일입니다.");
             return "register";
         }
+        // 역할 한글→영어 변환
+        String roleEng = role;
+        switch (role) {
+            case "학습자": roleEng = "STUDENT"; break;
+            case "강의자": roleEng = "INSTRUCTOR"; break;
+            case "관리자": roleEng = "ADMIN"; break;
+        }
+        // 핸드폰 번호 포맷팅 (010-1234-1234)
+        String phoneFormatted = null;
+        if (phone != null && !phone.isEmpty()) {
+            String digits = phone.replaceAll("[^0-9]", "");
+            if (digits.length() == 11 && digits.startsWith("010")) {
+                phoneFormatted = String.format("010-%s-%s", digits.substring(3,7), digits.substring(7));
+            } else {
+                phoneFormatted = phone; // 예외: 11자리가 아니면 원본 저장
+            }
+        }
         User user = new User();
         user.setId(id);
         user.setName(name);
         user.setPassword(password);
-        user.setRole(role);
-        user.setPhone(phoneNormalized);
+        user.setRole(roleEng);
+        user.setPhone(phoneFormatted);
         user.setEmail(email);
         if (gender != null) user.setGender(gender);
         if (birth != null && !birth.isEmpty()) user.setBirth(LocalDate.parse(birth));

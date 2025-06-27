@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* 드롭다운 스타일 예시 */
+        nav ul { display: flex; list-style: none; padding: 0; margin: 0; }
+        nav ul > li { position: relative; margin-right: 40px; font-weight: bold; }
+        nav ul > li:last-child { margin-right: 0; }
+        nav ul li a { color: #222; text-decoration: none; padding: 10px 20px; display: block; }
+        .submenu { display: none; position: absolute; top: 100%; left: 0; background: #fff; min-width: 160px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); z-index: 10; }
+        .submenu li { margin: 0; font-weight: normal; }
+        nav ul > li:hover .submenu { display: block; }
+    </style>
+</head>
+<body>
+    <header style="padding: 20px 0; border-bottom: 1px solid #eee;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 2rem; font-weight: bold; color: #222;">K-MOOC 강의 추천 플랫폼</div>
+            <div>
+                <span th:if="${user != null}"
+                      th:text="${user.role == 'STUDENT' ? '학습자' : (user.role == 'INSTRUCTOR' ? '강의자' : (user.role == 'ADMIN' ? '관리자' : ''))} + ' ' + ${user.name} + '님'"
+                      style="margin-right: 10px;"></span>
+                <a th:if="${user != null}" th:href="@{/mypage}" style="color: #4169e1; margin-right: 10px;">마이페이지</a>
+                <a th:if="${user != null}" th:href="@{/logout}" style="color: #4169e1;">로그아웃</a>
+                <a th:if="${user == null}" th:href="@{/login}" style="color: #4169e1; margin-right: 10px;">로그인</a>
+                <a th:if="${user == null}" th:href="@{/register}" style="color: #4169e1;">회원가입</a>
+            </div>
+        </div>
+        <nav style="margin-top: 20px;">
+            <ul>
+                <!-- 학습자 메뉴: 모든 유저에게 보임 -->
+                <li>
+                    <a href="#">학습자</a>
+                    <ul class="submenu">
+                        <li><a href="/recommend">강의 추천</a></li>
+                        <li><a href="/path">나만의 경로</a></li>
+                        <li><a href="/chatbot">AI 챗봇</a></li>
+                        <li><a href="/mycourses">내 강의실</a></li>
+                    </ul>
+                </li>
+                <!-- 강의자 메뉴: INSTRUCTOR, ADMIN만 보임 -->
+                <li th:if="${user != null and (user.role == 'INSTRUCTOR' or user.role == 'ADMIN')}">
+                    <a href="#">강의자</a>
+                    <ul class="submenu">
+                        <li><a href="/course/add">강의 등록</a></li>
+                        <li><a href="/course/manage">강의 관리</a></li>
+                        <li><a href="/course/students">수강생 확인</a></li>
+                    </ul>
+                </li>
+                <!-- 관리자 메뉴: ADMIN만 보임 -->
+                <li th:if="${user != null and user.role == 'ADMIN'}">
+                    <a href="#">관리자</a>
+                    <ul class="submenu">
+                        <li><a href="/admin/users">회원 관리</a></li>
+                        <li><a href="/admin/stats">통계 확인</a></li>
+                    </ul>
+                </li>
+                <!-- 커뮤니티 메뉴: 항상 보임 -->
+                <li>
+                    <a href="#">커뮤니티</a>
+                    <ul class="submenu">
+                        <li><a href="/notice">공지사항</a></li>
+                        <li><a href="/qna">질문게시판</a></li>
+                        <li><a href="/review">수강후기</a></li>
+                        <li><a href="/board">자유게시판</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+</body>
+</html> 
