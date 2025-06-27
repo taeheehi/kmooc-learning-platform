@@ -1,1 +1,64 @@
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>회원 관리</title><link rel="stylesheet" href="/css/admin/admin_users.css"></head><body><h1>회원 관리 페이지</h1></body></html> 
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원 관리</title>
+    <link rel="stylesheet" href="/css/admin/admin_users.css">
+    <style>
+        body { font-family: sans-serif; }
+        .container { width: 90%; margin: 20px auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        textarea { width: 100%; box-sizing: border-box; }
+        button { padding: 5px 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{header :: header}"></div>
+
+    <div class="container">
+        <h1>회원 관리</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>아이디</th>
+                    <th>이름</th>
+                    <th>역할</th>
+                    <th>로그인 실패</th>
+                    <th>계정 상태</th>
+                    <th>관리자 메모</th>
+                    <th>기능</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.idx}"></td>
+                    <td th:text="${user.id}"></td>
+                    <td th:text="${user.name}"></td>
+                    <td th:text="${user.role}"></td>
+                    <td th:text="${user.loginFailCount}"></td>
+                    <td>
+                        <span th:if="${user.accountNonLocked}" style="color: green;">정상</span>
+                        <span th:unless="${user.accountNonLocked}" style="color: red;">잠김</span>
+                    </td>
+                    <td>
+                        <form th:action="@{/admin/users/update-memo}" method="post">
+                            <input type="hidden" name="userId" th:value="${user.id}" />
+                            <textarea name="memo" rows="2" th:text="${user.adminMemo}"></textarea>
+                            <button type="submit">메모 저장</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form th:action="@{/admin/users/toggle-lock}" method="post" style="display: inline;">
+                            <input type="hidden" name="userId" th:value="${user.id}" />
+                            <button type="submit" th:text="${user.accountNonLocked} ? '계정 잠금' : '잠금 해제'"></button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html> 

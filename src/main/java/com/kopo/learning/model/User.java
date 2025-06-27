@@ -25,7 +25,12 @@ public class User {
     private LocalDateTime updatedAt;
     private String status;
     private LocalDateTime lastLoginAt;
-    private Integer loginFailCount;
+    private Integer loginFailCount = 0;
+    private boolean accountNonLocked = true;
+    private LocalDateTime lockTime;
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String adminMemo;
     private String profileImg;
     private String gender;
     private LocalDate birth;
@@ -57,6 +62,12 @@ public class User {
     public void setLastLoginAt(LocalDateTime lastLoginAt) { this.lastLoginAt = lastLoginAt; }
     public Integer getLoginFailCount() { return loginFailCount; }
     public void setLoginFailCount(Integer loginFailCount) { this.loginFailCount = loginFailCount; }
+    public boolean isAccountNonLocked() { return accountNonLocked; }
+    public void setAccountNonLocked(boolean accountNonLocked) { this.accountNonLocked = accountNonLocked; }
+    public LocalDateTime getLockTime() { return lockTime; }
+    public void setLockTime(LocalDateTime lockTime) { this.lockTime = lockTime; }
+    public String getAdminMemo() { return adminMemo; }
+    public void setAdminMemo(String adminMemo) { this.adminMemo = adminMemo; }
     public String getProfileImg() { return profileImg; }
     public void setProfileImg(String profileImg) { this.profileImg = profileImg; }
     public String getGender() { return gender; }

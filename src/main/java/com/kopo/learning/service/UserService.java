@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 
 @Service
 public class UserService {
+    public static final int MAX_FAILED_ATTEMPTS = 5;
+    private static final long LOCK_TIME_DURATION = 30; // 30 minutes
+
     @Autowired
     private UserRepository userRepository;
 
@@ -46,17 +49,42 @@ public class UserService {
 
     public User loginUser(String id, String password) {
         User user = userRepository.findById(id);
-        if (user != null && user.getPassword().equals(password)) {
+
+        if (user == null) {
+            return null; // 사용자가 존재하지 않음
+        }
+
+        if (!user.isAccountNonLocked()) {
+            if (user.getLockTime() != null && user.getLockTime().plusMinutes(LOCK_TIME_DURATION).isBefore(LocalDateTime.now())) {
+                // 잠금 시간이 지나면 계정 잠금 해제
+                user.setAccountNonLocked(true);
+                user.setLoginFailCount(0);
+                user.setLockTime(null);
+                userRepository.save(user);
+            } else {
+                // 여전히 계정 잠금 상태
+                throw new RuntimeException("계정이 잠겼습니다. 30분 후에 다시 시도해주세요.");
+            }
+        }
+
+        if (user.getPassword().equals(password)) {
+            // 로그인 성공
             user.setLoginFailCount(0);
             user.setLastLoginAt(LocalDateTime.now());
+            user.setAccountNonLocked(true);
+            user.setLockTime(null);
             userRepository.save(user);
             return user;
         } else {
-            if (user != null) {
-                int fail = user.getLoginFailCount() == null ? 1 : user.getLoginFailCount() + 1;
-                user.setLoginFailCount(fail);
-                userRepository.save(user);
+            // 로그인 실패
+            int failCount = user.getLoginFailCount() == null ? 1 : user.getLoginFailCount() + 1;
+            user.setLoginFailCount(failCount);
+
+            if (failCount >= MAX_FAILED_ATTEMPTS) {
+                user.setAccountNonLocked(false);
+                user.setLockTime(LocalDateTime.now());
             }
+            userRepository.save(user);
             return null;
         }
     }

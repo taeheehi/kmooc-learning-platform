@@ -30,13 +30,18 @@ public class AuthController {
     public String loginPost(@RequestParam String id,
                             @RequestParam String password,
                             HttpSession session) {
-        User user = userService.loginUser(id, password);
-        if (user != null) {
-            session.setAttribute("user", user);
-            session.removeAttribute("loginError");
-            return "redirect:/";
-        } else {
-            session.setAttribute("loginError", "아이디 또는 비밀번호가 올바르지 않습니다.");
+        try {
+            User user = userService.loginUser(id, password);
+            if (user != null) {
+                session.setAttribute("user", user);
+                session.removeAttribute("loginError");
+                return "redirect:/";
+            } else {
+                session.setAttribute("loginError", "아이디 또는 비밀번호가 올바르지 않습니다.");
+                return "redirect:/login";
+            }
+        } catch (RuntimeException e) {
+            session.setAttribute("loginError", e.getMessage());
             return "redirect:/login";
         }
     }
