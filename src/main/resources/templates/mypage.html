@@ -5,6 +5,72 @@
     <title>마이페이지</title>
 </head>
 <body>
-    <h1>마이페이지</h1>
+    <h2>마이페이지</h2>
+    <form method="post" action="/mypage">
+        <div>
+            <label>아이디</label>
+            <input type="text" th:value="${user.id}" readonly>
+        </div>
+        <div>
+            <label>이름</label>
+            <input type="text" name="name" th:value="${user.name}">
+        </div>
+        <div>
+            <label>역할</label>
+            <input type="text" th:value="${user.role}" readonly>
+        </div>
+        <div>
+            <label>핸드폰번호</label>
+            <input type="text" name="phone" th:value="${user.phone}">
+        </div>
+        <div>
+            <label>이메일</label>
+            <input type="email" name="email" th:value="${user.email}">
+        </div>
+        <div>
+            <label>성별</label>
+            <select name="gender">
+                <option th:selected="${user.gender == null}" value="">선택</option>
+                <option th:selected="${user.gender == 'M'}" value="M">남성</option>
+                <option th:selected="${user.gender == 'F'}" value="F">여성</option>
+            </select>
+        </div>
+        <div>
+            <label>생년월일</label>
+            <input type="date" name="birth" th:value="${user.birth}">
+        </div>
+        <div>
+            <label>기존 비밀번호</label>
+            <input type="password" name="oldPassword">
+        </div>
+        <div>
+            <label>새 비밀번호</label>
+            <input type="password" name="newPassword">
+        </div>
+        <button type="submit">정보 수정</button>
+    </form>
+    <div>
+        <b>이메일 인증:</b> <span th:text="${user.emailVerified} ? '인증됨' : '미인증'"></span>
+        <th:block th:if="${!user.emailVerified}">
+            <form method="post" action="/request-email-verify" style="display:inline">
+                <button type="submit">이메일 인증 요청</button>
+            </form>
+            <span th:if="${emailMsg != null}" th:text="${emailMsg}" style="color:blue"></span>
+        </th:block>
+        <br>
+        <b>로그인 실패 횟수:</b> <span th:text="${user.loginFailCount}"></span><br>
+        <b>마지막 로그인:</b> <span th:text="${user.lastLoginAt}"></span><br>
+        <b>상태:</b> <span th:text="${user.status}"></span><br>
+        <b>관리자 메모:</b> <span th:text="${user.remark}"></span><br>
+    </div>
+    <div>
+        <b>프로필 이미지:</b><br>
+        <img th:if="${user.profileImg != null}" th:src="@{'/profile-img/' + ${user.profileImg}}" alt="프로필 이미지" width="120" height="120" style="border-radius:50%"><br>
+        <form method="post" action="/upload-profile-img" enctype="multipart/form-data">
+            <input type="file" name="profileImg" accept="image/*">
+            <button type="submit">이미지 업로드</button>
+        </form>
+    </div>
+    <div th:if="${msg != null}" th:text="${msg}" style="color:red"></div>
 </body>
 </html> 
