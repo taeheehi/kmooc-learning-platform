@@ -1,0 +1,21 @@
+/* header 전용 스타일 (필요시 여기에 작성) */
+.header-link {
+  color: #4169e1 !important;
+  font-weight: bold !important;
+  text-decoration: none !important;
+}
+
+/* 세부메뉴 항목들을 굵게 표시 */
+.nav-item .nav-link {
+  font-weight: bold !important;
+}
+
+/* 드롭다운 메뉴 항목들도 굵게 표시 */
+.dropdown-menu .dropdown-item {
+  font-weight: bold !important;
+}
+
+/* 네비게이션 바의 모든 링크를 굵게 표시 */
+.navbar-nav .nav-link {
+  font-weight: bold !important;
+} 

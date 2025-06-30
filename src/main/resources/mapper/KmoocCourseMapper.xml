@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kopo.learning.student.courselist.KmoocCourseMapper">
+    <select id="findByCourseNameContainingIgnoreCaseAndCategory" resultType="com.kopo.learning.common.vo.KmoocCourse">
+        SELECT * FROM kmooc_courses WHERE LOWER(course_name) LIKE CONCAT('%', LOWER(#{keyword}), '%') AND category = #{category}
+    </select>
+    <select id="findByCourseNameContainingIgnoreCase" resultType="com.kopo.learning.common.vo.KmoocCourse">
+        SELECT * FROM kmooc_courses WHERE LOWER(course_name) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+    </select>
+    <select id="findByCategory" resultType="com.kopo.learning.common.vo.KmoocCourse">
+        SELECT * FROM kmooc_courses WHERE category = #{category}
+    </select>
+    <select id="findByCategoryIn" resultType="com.kopo.learning.common.vo.KmoocCourse">
+        SELECT * FROM kmooc_courses WHERE category IN
+        <foreach item="cat" collection="categories" open="(" separator="," close=")">
+            #{cat}
+        </foreach>
+    </select>
+    <select id="findByCourseNameContainingIgnoreCaseAndCategoryIn" resultType="com.kopo.learning.common.vo.KmoocCourse">
+        SELECT * FROM kmooc_courses WHERE LOWER(course_name) LIKE CONCAT('%', LOWER(#{keyword}), '%') AND category IN
+        <foreach item="cat" collection="categories" open="(" separator="," close=")">
+            #{cat}
+        </foreach>
+    </select>
+    <select id="countByCategory" resultType="long">
+        SELECT COUNT(*) FROM kmooc_courses WHERE category = #{category}
+    </select>
+    <select id="findDistinctCategories" resultType="string">
+        SELECT DISTINCT category FROM kmooc_courses WHERE category IS NOT NULL ORDER BY category
+    </select>
+    <select id="findAll" resultType="com.kopo.learning.common.vo.KmoocCourse">
+        SELECT * FROM kmooc_courses
+    </select>
+    <insert id="save" parameterType="com.kopo.learning.common.vo.KmoocCourse">
+        INSERT INTO kmooc_courses (course_id, course_name, teacher_name, category, thumbnail_url)
+        VALUES (#{courseId}, #{courseName}, #{teacherName}, #{category}, #{thumbnailUrl})
+    </insert>
+    <update id="update" parameterType="com.kopo.learning.common.vo.KmoocCourse">
+        UPDATE kmooc_courses SET course_name=#{courseName}, teacher_name=#{teacherName}, category=#{category}, thumbnail_url=#{thumbnailUrl} WHERE course_id=#{courseId}
+    </update>
+</mapper> 

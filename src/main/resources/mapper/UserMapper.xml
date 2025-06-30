@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kopo.learning.admin.user.UserMapper">
+    <select id="findById" parameterType="string" resultType="com.kopo.learning.common.vo.User">
+        SELECT * FROM user WHERE id = #{id}
+    </select>
+    <select id="findAll" resultType="com.kopo.learning.common.vo.User">
+        SELECT * FROM user
+    </select>
+    <insert id="save" parameterType="com.kopo.learning.common.vo.User">
+        INSERT INTO user (id, password, name, role, phone, email, created_at, updated_at, gender, birth, status, last_login_at, login_fail_count, account_non_locked, lock_time, admin_memo, profile_img, email_verified, remark, email_verify_token)
+        VALUES (#{id}, #{password}, #{name}, #{role}, #{phone}, #{email}, #{createdAt}, #{updatedAt}, #{gender}, #{birth}, #{status}, #{lastLoginAt}, #{loginFailCount}, #{accountNonLocked}, #{lockTime}, #{adminMemo}, #{profileImg}, #{emailVerified}, #{remark}, #{emailVerifyToken})
+    </insert>
+    <update id="update" parameterType="com.kopo.learning.common.vo.User">
+        UPDATE user SET password=#{password}, name=#{name}, role=#{role}, phone=#{phone}, email=#{email}, updated_at=#{updatedAt}, gender=#{gender}, birth=#{birth}, status=#{status}, last_login_at=#{lastLoginAt}, login_fail_count=#{loginFailCount}, account_non_locked=#{accountNonLocked}, lock_time=#{lockTime}, admin_memo=#{adminMemo}, profile_img=#{profileImg}, email_verified=#{emailVerified}, remark=#{remark}, email_verify_token=#{emailVerifyToken} WHERE id=#{id}
+    </update>
+    <!-- 기타 count, exists, group by 등 쿼리도 추가 필요 -->
+</mapper> 

@@ -1,6 +1,6 @@
 package com.kopo.learning;
 
-import com.kopo.learning.model.User;
+import com.kopo.learning.common.vo.User;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;

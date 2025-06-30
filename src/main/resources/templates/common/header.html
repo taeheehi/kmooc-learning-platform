@@ -1,0 +1,136 @@
+<div th:fragment="header">
+    <header style="width: 100%; background-color: #fff; padding: 20px 40px; border-bottom: 1px solid #eee; box-shadow: 0 2px 4px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
+        <!-- 왼쪽 로고 -->
+        <a th:href="@{/}" style="text-decoration: none; color: inherit;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: #222;">
+            K-MOOC 강의 추천 플랫폼
+          </div>
+        </a>
+        <!-- 오른쪽 사용자 메뉴 -->
+        <div style="display: flex; align-items: center; gap: 15px; padding-right: 30px;">
+            <a th:if="${user == null}" th:href="@{/login}" class="header-link">로그인</a>
+            <a th:if="${user == null}" th:href="@{/register}" class="header-link">회원가입</a>
+            <span th:if="${user != null}"
+                  th:text="${user.role == 'STUDENT' ? '학습자' : (user.role == 'INSTRUCTOR' ? '강의자' : (user.role == 'ADMIN' ? '관리자' : ''))} + ' ' + ${user.name} + '님'"
+                  style="margin-right: 10px;"></span>
+            <a th:if="${user != null}" th:href="@{/mypage}" class="header-link">마이페이지</a>
+            <a th:if="${user != null}" th:href="@{/logout}" class="header-link">로그아웃</a>
+        </div>
+    </header>
+
+    <!-- 메뉴바 -->
+    <nav style="background-color: #f9f9f9; border-bottom: 1px solid #eee;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <ul style="display: flex; justify-content: center; list-style: none; padding: 0; margin: 0;">
+                <li style="margin: 0 30px; position: relative; font-weight: bold;">
+                    <a href="#">학습자</a>
+                    <ul class="submenu">
+                        <li><a href="/recommend">강의 추천</a></li>
+                        <li><a href="/chatbot">AI 챗봇</a></li>
+                        <li><a href="/path">나만의 경로</a></li>
+                        <li><a href="/mycourses">내 강의실</a></li>
+                    </ul>
+                </li>
+                <li th:if="${user != null and (user.role == 'INSTRUCTOR' or user.role == 'ADMIN')}" style="margin: 0 30px; position: relative; font-weight: bold;">
+                    <a href="#">강의자</a>
+                    <ul class="submenu">
+                        <li><a href="/course/add">강의 등록</a></li>
+                        <li><a href="/course/manage">강의 관리</a></li>
+                        <li><a href="/course/students">수강생 확인</a></li>
+                    </ul>
+                </li>
+                <li th:if="${user != null and user.role == 'ADMIN'}" style="margin: 0 30px; position: relative; font-weight: bold;">
+                    <a href="#">관리자</a>
+                    <ul class="submenu">
+                        <li><a href="/admin/users">회원 관리</a></li>
+                        <li><a href="/admin/stats">통계 확인</a></li>
+                    </ul>
+                </li>
+                <li style="margin: 0 30px; position: relative; font-weight: bold;">
+                    <a href="#">커뮤니티</a>
+                    <ul class="submenu">
+                        <li><a href="/notice">공지사항</a></li>
+                        <li><a href="/qna">질문게시판</a></li>
+                        <li><a href="/review">수강후기</a></li>
+                        <li><a href="/board">자유게시판</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <style>
+        body {
+            margin: 0;
+            background-color: #f7f7f7;
+            font-family: Arial, sans-serif;
+        }
+        header {
+            width: 100%;
+            background-color: #fff;
+            padding: 20px 40px;
+            border-bottom: 1px solid #eee;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+        .main-nav {
+            background-color: #fff;
+            border-bottom: 1px solid #eee;
+        }
+        .content-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        nav ul li a {
+            color: #222;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: block;
+        }
+        /* 서브메뉴 박스 스타일 */
+        .submenu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #fff;
+            min-width: 180px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 4px;
+            padding: 8px 0;
+            z-index: 10;
+        }
+        /* 서브메뉴 아이템 기본 스타일 제거 */
+        .submenu li {
+            list-style: none;     /* ○ 마커 제거 */
+            margin: 0;
+            font-weight: normal;
+        }
+        /* 서브메뉴 링크 스타일링 */
+        .submenu li a {
+            display: block;
+            padding: 10px 20px;
+            color: #4169e1;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: background-color 0.2s ease;
+            font-weight: bold;
+        }
+        /* Hover 효과 */
+        .submenu li a:hover {
+            background-color: #f0f0f0;
+            color: #4169e1;    /* Hover 시에도 동일 색상 유지 */
+            
+        }
+        nav ul > li:hover .submenu {
+            display: block;
+        }
+        .header-link {
+            color: #4169e1 !important;
+            font-weight: bold;
+            text-decoration: none !important;
+        }
+
+    </style>
+    <link rel="stylesheet" href="/css/header.css">
+</div>

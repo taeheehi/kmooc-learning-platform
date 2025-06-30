@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>강의 목록</title>
+    <link rel="stylesheet" href="/css/student/courses.css">
+</head>
+<body>
+    <div th:replace="~{header :: header}"></div>
+    <div class="container">
+        <h1>K-MOOC 강의 목록</h1>
+
+        <!-- 검색 및 필터링 섹션 -->
+        <form th:action="@{/courses}" method="get" class="filter-section">
+            <div class="search-box">
+                <input type="text" name="keyword" placeholder="강의명을 입력하세요..." th:value="${selectedKeyword}">
+                <button type="submit">검색</button>
+            </div>
+            <div class="category-filter">
+                <select name="category" onchange="this.form.submit()">
+                    <option value="">전체 카테고리</option>
+                    <option th:each="cat : ${categories}"
+                            th:value="${cat}"
+                            th:text="${cat}"
+                            th:selected="${cat == selectedCategory}"></option>
+                </select>
+            </div>
+        </form>
+
+        <!-- 카테고리 태그형 버튼 UI -->
+        <div class="category-tags">
+            <form th:action="@{/courses}" method="get" id="categoryForm">
+                <input type="hidden" name="keyword" th:value="${selectedKeyword}">
+                <div class="tags-list">
+                    <button type="button"
+                            class="category-tag"
+                            th:classappend="${#lists.isEmpty(selectedCategory) ? 'selected' : ''}"
+                            onclick="selectCategory('')">전체
+                    </button>
+                    <button type="button"
+                            th:each="cat,iter : ${categories}"
+                            class="category-tag"
+                            th:classappend="${selectedCategory != null and #strings.contains(selectedCategory, cat) ? 'selected' : ''}"
+                            th:data-value="${cat}"
+                            th:text="${cat} + ' (' + ${categoryCounts[cat]} + ')'"
+                            onclick="selectCategory(this.getAttribute('data-value'))">
+                    </button>
+                </div>
+                <input type="hidden" name="category" id="categoryInput" th:value="${selectedCategory}">
+            </form>
+        </div>
+
+        <script>
+            // 복수 선택 지원 (쉼표로 category 값 전달)
+            function selectCategory(cat) {
+                let input = document.getElementById('categoryInput');
+                let current = input.value ? input.value.split(',') : [];
+                if (cat === '') {
+                    input.value = '';
+                } else {
+                    if (current.includes(cat)) {
+                        input.value = current.filter(c => c !== cat).join(',');
+                    } else {
+                        current.push(cat);
+                        input.value = current.filter(c => c).join(',');
+                    }
+                }
+                document.getElementById('categoryForm').submit();
+            }
+        </script>
+
+        <!-- 강의 목록 그리드 -->
+        <div class="course-grid">
+            <div class="course-card" th:each="course : ${courses.content}">
+                <img th:src="@{/image-proxy(url=${course.thumbnailUrl})}" alt="강의 썸네일" class="thumbnail"
+                     onerror="this.onerror=null;this.src='/images/no-image.png';">
+                <div class="course-info">
+                    <h3 class="course-name" th:text="${course.courseName}">강의명</h3>
+                    <p class="teacher-name" th:text="${course.teacherName}">교수명</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 페이지네이션 -->
+    <nav aria-label="Page navigation" class="pagination-nav"
+         th:if="${courses.totalPages > 0}">
+        <ul class="pagination">
+            <!-- 이전 페이지 -->
+            <li class="page-item" th:classappend="${!courses.hasPrevious()} ? 'disabled'">
+                <a class="page-link" th:href="@{/courses(page=${courses.number - 1}, keyword=${selectedKeyword}, category=${selectedCategory})}">
+                    <span>&laquo;</span>
+                </a>
+            </li>
+
+            <!-- 페이지 번호 -->
+            <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, courses.totalPages - 1)}"
+                th:if="${pageNum >= courses.number - 2 && pageNum <= courses.number + 2}"
+                th:classappend="${pageNum == courses.number} ? 'active'">
+                <a class="page-link" th:href="@{/courses(page=${pageNum}, keyword=${selectedKeyword}, category=${selectedCategory})}"
+                   th:text="${pageNum + 1}"></a>
+            </li>
+
+            <!-- 다음 페이지 -->
+            <li class="page-item" th:classappend="${!courses.hasNext()} ? 'disabled'">
+                <a class="page-link" th:href="@{/courses(page=${courses.number + 1}, keyword=${selectedKeyword}, category=${selectedCategory})}">
+                    <span>&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+</body>
+</html> 
