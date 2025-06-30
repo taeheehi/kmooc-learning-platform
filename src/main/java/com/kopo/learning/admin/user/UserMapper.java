@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface UserMapper {
@@ -17,9 +18,9 @@ public interface UserMapper {
     long countByStatus(@Param("status") String status);
     long countByLastLoginAtBeforeOrLastLoginAtIsNull(@Param("dateTime") LocalDateTime dateTime);
 
-    List<Object[]> countByRole();
-    List<Object[]> countLoginsByHourAfter(@Param("since") LocalDateTime since);
-    List<Object[]> countByGender();
+    List<Map<String, Object>> countByRole();
+    List<Map<String, Object>> countLoginsByHourAfter(@Param("since") LocalDateTime since);
+    List<Map<String, Object>> countByGender();
 
     List<User> findAll();
     int save(User user);

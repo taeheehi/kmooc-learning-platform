@@ -14,5 +14,43 @@
     <update id="update" parameterType="com.kopo.learning.common.vo.User">
         UPDATE user SET password=#{password}, name=#{name}, role=#{role}, phone=#{phone}, email=#{email}, updated_at=#{updatedAt}, gender=#{gender}, birth=#{birth}, status=#{status}, last_login_at=#{lastLoginAt}, login_fail_count=#{loginFailCount}, account_non_locked=#{accountNonLocked}, lock_time=#{lockTime}, admin_memo=#{adminMemo}, profile_img=#{profileImg}, email_verified=#{emailVerified}, remark=#{remark}, email_verify_token=#{emailVerifyToken} WHERE id=#{id}
     </update>
+    <select id="existsByPhone" parameterType="string" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM user WHERE phone = #{phone})
+    </select>
+    
+    <select id="existsByEmail" parameterType="string" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM user WHERE email = #{email})
+    </select>
+
+    <select id="countByCreatedAtAfter" parameterType="java.time.LocalDateTime" resultType="long">
+        SELECT COUNT(*) FROM user WHERE created_at >= #{dateTime}
+    </select>
+
+    <select id="countByLastLoginAtAfter" parameterType="java.time.LocalDateTime" resultType="long">
+        SELECT COUNT(*) FROM user WHERE last_login_at >= #{dateTime}
+    </select>
+
+    <select id="countByStatus" parameterType="string" resultType="long">
+        SELECT COUNT(*) FROM user WHERE status = #{status}
+    </select>
+
+    <select id="countByLastLoginAtBeforeOrLastLoginAtIsNull" parameterType="java.time.LocalDateTime" resultType="long">
+        SELECT COUNT(*) FROM user WHERE last_login_at &lt; #{dateTime} OR last_login_at IS NULL
+    </select>
+
+    <select id="countByRole" resultType="map">
+        SELECT role, COUNT(*) as count FROM user GROUP BY role
+    </select>
+
+    <select id="countLoginsByHourAfter" parameterType="java.time.LocalDateTime" resultType="map">
+        SELECT HOUR(last_login_at) as hour, COUNT(*) as count
+        FROM user
+        WHERE last_login_at >= #{since}
+        GROUP BY HOUR(last_login_at)
+    </select>
+    
+    <select id="countByGender" resultType="map">
+        SELECT gender, COUNT(*) as count FROM user GROUP BY gender
+    </select>
     <!-- 기타 count, exists, group by 등 쿼리도 추가 필요 -->
 </mapper> 

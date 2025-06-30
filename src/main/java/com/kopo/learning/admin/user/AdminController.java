@@ -54,8 +54,8 @@ public class AdminController {
         // --- 3. 24시간 접속 트렌드 (선 그래프) ---
         Map<Integer, Long> hourlyLogins = userMapper.countLoginsByHourAfter(LocalDateTime.now().minusHours(24)).stream()
                 .collect(Collectors.toMap(
-                        row -> ((Number) row[0]).intValue(),
-                        row -> ((Number) row[1]).longValue()
+                        row -> ((Number) row.get("hour")).intValue(),
+                        row -> ((Number) row.get("count")).longValue()
                 ));
         // 0-23시까지 모든 시간에 대한 기본값 0을 설정
         Map<Integer, Long> fullHourlyLogins = new LinkedHashMap<>();
@@ -67,7 +67,10 @@ public class AdminController {
 
         // --- 4. 역할별 분포 (파이 차트) ---
         Map<String, Long> roleCounts = userMapper.countByRole().stream()
-                .collect(Collectors.toMap(row -> (String) row[0], row -> (Long) row[1]));
+                .collect(Collectors.toMap(
+                        row -> (String) row.get("role"),
+                        row -> ((Number) row.get("count")).longValue()
+                ));
         model.addAttribute("roleCounts", roleCounts);
 
         // --- 5. 기간별 신규 가입자/휴면 전환자 (막대+꺾은선 그래프) ---
@@ -116,7 +119,10 @@ public class AdminController {
 
         // --- 6. 성별/연령대별 통계 ---
         Map<String, Long> genderCounts = userMapper.countByGender().stream()
-                .collect(Collectors.toMap(row -> (String) row[0], row -> (Long) row[1]));
+                .collect(Collectors.toMap(
+                        row -> String.valueOf(row.get("gender")),
+                        row -> ((Number) row.get("count")).longValue()
+                ));
         
         Map<String, Long> ageGroupCounts = new LinkedHashMap<>();
         ageGroupCounts.put("10대", 0L);
@@ -156,7 +162,7 @@ public class AdminController {
             } else {
                 user.setLockTime(LocalDateTime.now());
             }
-            userMapper.save(user);
+            userMapper.update(user);
         }
         return "redirect:/admin/users";
     }
@@ -166,7 +172,7 @@ public class AdminController {
         User user = userMapper.findById(userId);
         if (user != null) {
             user.setAdminMemo(memo);
-            userMapper.save(user);
+            userMapper.update(user);
         }
         return "redirect:/admin/users";
     }
