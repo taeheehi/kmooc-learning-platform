@@ -1,0 +1,52 @@
+<th:block th:replace="~{common/header :: header}"></th:block>
+
+<div class="container" style="margin-top: 20px; padding: 20px;">
+    <h1 style="text-align: center; margin-bottom: 20px;">K-MOOC 전체 강의 목록</h1>
+
+    <table class="table" style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+        <colgroup>
+            <col style="width: 6%;">  // 사이트명 너비
+            <col style="width: 6%;">  // 분류 너비
+            <col style="width: auto;"> // 강의명 너비
+            <col style="width: 20%;">
+            <col style="width: 13%;">
+            <col style="width: 4%;">   // 주차 너비
+            <col style="width: 6%;">
+            <col style="width: 6%;">
+        </colgroup>
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th style="padding: 8px; border: 1px solid #ddd; white-space: nowrap;">사이트</th>
+                <th style="padding: 8px; border: 1px solid #ddd; white-space: nowrap;">분류</th>
+                <th style="padding: 8px; border: 1px solid #ddd; white-space: nowrap;">강의명</th>
+                <th style="padding: 8px; border: 1px solid #ddd; white-space: nowrap;">기관명</th>
+                <th style="padding: 8px; border: 1px solid #ddd; white-space: nowrap;">교수진</th>
+                <th style="padding: 8px; border: 1px solid #ddd; white-space: nowrap;">주차</th>
+                <th style="padding: 8px; border: 1px solid #ddd; white-space: nowrap;">개강일</th>
+                <th style="padding: 8px; border: 1px solid #ddd; white-space: nowrap;">종강일</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="course : ${courses}">
+                <td style="padding: 8px; border: 1px solid #ddd; white-space: nowrap;" th:text="${course.site}"></td>
+                <td style="padding: 8px; border: 1px solid #ddd;" th:text="${course.category}"></td>
+                <td style="padding: 8px; border: 1px solid #ddd; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" th:text="${course.name}"></td>
+                <td style="padding: 8px; border: 1px solid #ddd; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" th:text="${course.orgName}"></td>
+                <td style="padding: 8px; border: 1px solid #ddd; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <th:block th:if="${course.professor != null}">
+                        <th:block th:with="professors=${#strings.arraySplit(course.professor, ',')}">
+                            <span th:if="${#arrays.length(professors) > 3}" th:text="${professors[0] + ', ' + professors[1] + ', ' + professors[2] + '...'}"></span>
+                            <span th:unless="${#arrays.length(professors) > 3}" th:text="${course.professor}"></span>
+                        </th:block>
+                    </th:block>
+                </td>
+                <td style="padding: 8px; border: 1px solid #ddd; white-space: nowrap; text-align: center;" th:text="${course.courseWeek}"></td>
+                <td style="padding: 8px; border: 1px solid #ddd; white-space: nowrap;" th:text="${course.studyStart != null and #strings.length(course.studyStart) >= 10 ? #strings.substring(course.studyStart, 2, 10) : ''}"></td>
+                <td style="padding: 8px; border: 1px solid #ddd; white-space: nowrap;" th:text="${course.studyEnd != null and #strings.length(course.studyEnd) >= 10 ? #strings.substring(course.studyEnd, 2, 10) : ''}"></td>
+            </tr>
+        </tbody>
+    </table>
+    <div th:if="${courses == null or courses.isEmpty()}" style="text-align: center; padding: 20px;">
+        <p>표시할 강의 데이터가 없습니다.</p>
+    </div>
+</div> 
