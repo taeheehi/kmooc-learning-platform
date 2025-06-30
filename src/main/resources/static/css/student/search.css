@@ -1,2 +1,21 @@
 /* search.css (recommend에서 이름 변경) */
-/* ... 기존 recommend.css 내용 ... */ 
+/* ... 기존 recommend.css 내용 ... */
+
+.link-button {
+    display: inline-block;
+    padding: 5px 10px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.link-button:hover {
+    background-color: #0056b3;
+} 
