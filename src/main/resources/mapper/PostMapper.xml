@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kopo.learning.community.vo.PostMapper">
+
+    <!-- 결과 매핑 -->
+    <resultMap id="PostResultMap" type="com.kopo.learning.community.vo.Post">
+        <id property="idx" column="id"/>
+        <result property="boardType" column="board_type"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="authorId" column="author_id"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- 작성자 표시용 결과 매핑 -->
+    <resultMap id="PostWithAuthorDisplayResultMap" type="com.kopo.learning.community.vo.Post">
+        <id property="idx" column="id"/>
+        <result property="boardType" column="board_type"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="authorId" column="author_id"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="authorDisplay" column="author_display"/>
+    </resultMap>
+
+    <!-- 게시판 타입별 게시글 목록 조회 (최신순) -->
+    <select id="selectPostsByBoardType" resultMap="PostWithAuthorDisplayResultMap">
+        SELECT 
+            p.id,
+            p.board_type,
+            p.title,
+            p.content,
+            p.author_id,
+            p.view_count,
+            p.created_at,
+            p.updated_at,
+            CASE 
+                WHEN u.role = 'ADMIN' THEN CONCAT('관리자 ', u.name)
+                WHEN u.role = 'INSTRUCTOR' THEN CONCAT('강의자 ', u.name)
+                ELSE u.name
+            END as author_display
+        FROM posts p
+        LEFT JOIN user u ON p.author_id = u.id
+        WHERE p.board_type = #{boardType}
+        ORDER BY p.created_at DESC
+    </select>
+
+    <!-- 게시글 상세 조회 -->
+    <select id="selectPostById" resultMap="PostWithAuthorDisplayResultMap">
+        SELECT 
+            p.id,
+            p.board_type,
+            p.title,
+            p.content,
+            p.author_id,
+            p.view_count,
+            p.created_at,
+            p.updated_at,
+            CASE 
+                WHEN u.role = 'ADMIN' THEN CONCAT('관리자 ', u.name)
+                WHEN u.role = 'INSTRUCTOR' THEN CONCAT('강의자 ', u.name)
+                ELSE u.name
+            END as author_display
+        FROM posts p
+        LEFT JOIN user u ON p.author_id = u.id
+        WHERE p.id = #{idx}
+    </select>
+
+    <!-- 게시글 등록 -->
+    <insert id="insertPost" parameterType="com.kopo.learning.community.vo.Post" useGeneratedKeys="true" keyProperty="idx">
+        INSERT INTO posts (
+            board_type,
+            title,
+            content,
+            author_id,
+            view_count,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{boardType},
+            #{title},
+            #{content},
+            #{authorId},
+            #{viewCount},
+            NOW(),
+            NOW()
+        )
+    </insert>
+
+    <!-- 게시글 수정 -->
+    <update id="updatePost" parameterType="com.kopo.learning.community.vo.Post">
+        UPDATE posts 
+        SET 
+            title = #{title},
+            content = #{content},
+            updated_at = NOW()
+        WHERE id = #{idx}
+    </update>
+
+    <!-- 게시글 삭제 -->
+    <delete id="deletePost">
+        DELETE FROM posts 
+        WHERE id = #{idx}
+    </delete>
+
+    <!-- 조회수 증가 -->
+    <update id="increaseViewCount">
+        UPDATE posts 
+        SET view_count = view_count + 1
+        WHERE id = #{idx}
+    </update>
+
+</mapper> 

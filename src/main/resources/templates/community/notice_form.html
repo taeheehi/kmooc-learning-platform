@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>공지사항 작성</title>
+    <link rel="stylesheet" href="/css/community/notice.css">
+    <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+<div th:replace="~{common/header :: header}"></div>
+
+<div class="container">
+    <h1 class="title">공지사항 작성</h1>
+
+    <form th:action="@{/community/notice/new}" method="post" class="post-form">
+        <div class="form-group">
+            <label for="title">제목</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <div class="form-group">
+            <label for="content">내용</label>
+            <textarea id="content" name="content" rows="15" required></textarea>
+        </div>
+        <div class="button-container">
+            <button type="submit" class="btn submit-btn">등록</button>
+            <a th:href="@{/community/notice}" class="btn cancel-btn">취소</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .post-form {
+        margin-top: 20px;
+    }
+    .form-group {
+        margin-bottom: 25px;
+    }
+    .form-group label {
+        display: block;
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #444;
+    }
+    .form-group input[type="text"],
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+        box-sizing: border-box;
+    }
+    .form-group textarea {
+        resize: vertical;
+    }
+    .button-container {
+        text-align: right;
+        margin-top: 30px;
+    }
+    .btn {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .submit-btn {
+        background-color: #4169e1;
+        color: white;
+        margin-right: 10px;
+    }
+    .submit-btn:hover {
+        background-color: #3558c4;
+    }
+    .cancel-btn {
+        background-color: #f0f0f0;
+        color: #333;
+    }
+    .cancel-btn:hover {
+        background-color: #e0e0e0;
+    }
+</style>
+
+</body>
+</html> 
