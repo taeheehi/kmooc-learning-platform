@@ -39,9 +39,9 @@
                                     <tr th:each="post : ${posts}">
                                         <td th:text="${post.idx}"></td>
                                         <td>
-                                            <a th:href="@{/community/board/{idx}(idx=${post.idx})}" 
-                                               th:text="${post.title}" 
-                                               class="text-decoration-none text-dark"></a>
+                                            <a th:href="@{/community/board/{idx}(idx=${post.idx})}" class="text-decoration-none text-dark"
+                                               th:text="|${post.title}${post.replyCount != null and post.replyCount > 0 ? ' (' + post.replyCount + ')' : ''}|">
+                                            </a>
                                         </td>
                                         <td th:text="${post.authorId}"></td>
                                         <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}"></td>
@@ -52,6 +52,25 @@
                         </div>
                     </div>
                 </div>
+                <!-- 페이지네이션 UI 시작 -->
+                <nav th:if="${totalPages > 1}" aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${page == 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/community/board(page=${page-1})}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${i == page} ? 'active'">
+                            <a class="page-link" th:href="@{/community/board(page=${i})}" th:text="${i}"></a>
+                        </li>
+                        <li class="page-item" th:classappend="${page == totalPages} ? 'disabled'">
+                            <a class="page-link" th:href="@{/community/board(page=${page+1})}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- 페이지네이션 UI 끝 -->
             </div>
         </div>
     </div>

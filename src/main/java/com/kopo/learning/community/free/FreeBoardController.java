@@ -17,9 +17,14 @@ public class FreeBoardController {
     private final FreeBoardService freeBoardService;
 
     @GetMapping("/board")
-    public String freeBoard(Model model) {
-        List<Post> posts = freeBoardService.getFreeBoardList();
+    public String freeBoard(Model model, @RequestParam(defaultValue = "1") int page) {
+        final int PAGE_SIZE = 20;
+        int total = freeBoardService.countFreeBoardPosts();
+        int totalPages = (int) Math.ceil((double) total / PAGE_SIZE);
+        List<Post> posts = freeBoardService.getFreeBoardList(page, PAGE_SIZE);
         model.addAttribute("posts", posts);
+        model.addAttribute("page", page);
+        model.addAttribute("totalPages", totalPages);
         return "community/board";
     }
 

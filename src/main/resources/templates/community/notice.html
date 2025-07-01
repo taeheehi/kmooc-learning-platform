@@ -56,6 +56,25 @@
                         </table>
                     </div>
                 </div>
+                <!-- 페이지네이션 UI 시작 -->
+                <nav th:if="${totalPages > 1}" aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${page == 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/community/notice(page=${page-1})}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${i == page} ? 'active'">
+                            <a class="page-link" th:href="@{/community/notice(page=${i})}" th:text="${i}"></a>
+                        </li>
+                        <li class="page-item" th:classappend="${page == totalPages} ? 'disabled'">
+                            <a class="page-link" th:href="@{/community/notice(page=${page+1})}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- 페이지네이션 UI 끝 -->
             </div>
         </div>
     </div>

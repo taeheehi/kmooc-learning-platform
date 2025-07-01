@@ -15,8 +15,9 @@ public class NoticeService {
 
     private final PostMapper postMapper;
 
-    public List<Post> getNoticeList() {
-        return postMapper.selectPostsByBoardType("NOTICE");
+    public List<Post> getNoticeList(int page, int size) {
+        int offset = (page - 1) * size;
+        return postMapper.selectPostsByBoardType("NOTICE", size, offset);
     }
 
     public Post getPost(Long idx) {
@@ -58,5 +59,9 @@ public class NoticeService {
     @Transactional
     public void increaseViewCount(Long idx) {
         postMapper.increaseViewCount(idx);
+    }
+
+    public int countNoticePosts() {
+        return postMapper.countNoticePosts();
     }
 } 

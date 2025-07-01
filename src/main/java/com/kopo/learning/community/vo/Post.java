@@ -22,6 +22,10 @@ public class Post {
     private String authorId;
     private String authorDisplay; // 화면 표시용 작성자 (역할 + 이름)
     private Integer viewCount;
+    private Integer replyCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public Integer getReplyCount() { return replyCount; }
+    public void setReplyCount(Integer replyCount) { this.replyCount = replyCount; }
 } 

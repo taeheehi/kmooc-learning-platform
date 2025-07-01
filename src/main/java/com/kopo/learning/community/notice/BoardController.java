@@ -17,9 +17,14 @@ public class BoardController {
     private final NoticeService noticeService;
 
     @GetMapping("/notice")
-    public String noticeBoard(Model model) {
-        List<Post> posts = noticeService.getNoticeList();
+    public String noticeBoard(Model model, @RequestParam(defaultValue = "1") int page) {
+        final int PAGE_SIZE = 15;
+        int total = noticeService.countNoticePosts();
+        int totalPages = (int) Math.ceil((double) total / PAGE_SIZE);
+        List<Post> posts = noticeService.getNoticeList(page, PAGE_SIZE);
         model.addAttribute("posts", posts);
+        model.addAttribute("page", page);
+        model.addAttribute("totalPages", totalPages);
         return "community/notice";
     }
 

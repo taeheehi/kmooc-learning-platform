@@ -12,6 +12,7 @@
         <result property="viewCount" column="view_count"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
+        <result property="replyCount" column="reply_count"/>
     </resultMap>
 
     <!-- 작성자 표시용 결과 매핑 -->
@@ -47,6 +48,7 @@
         LEFT JOIN user u ON p.author_id = u.id
         WHERE p.board_type = #{boardType}
         ORDER BY p.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <!-- 게시글 상세 조회 -->
@@ -113,5 +115,25 @@
         SET view_count = view_count + 1
         WHERE id = #{idx}
     </update>
+
+    <!-- 게시글 목록에 댓글 수(reply_count) 포함 -->
+    <select id="selectFreeBoardListWithReplyCount" resultMap="PostResultMap">
+        SELECT p.*, 
+               (SELECT COUNT(*) FROM reply r WHERE r.post_id = p.id) AS reply_count
+        FROM posts p
+        WHERE p.board_type = 'FREE'
+        ORDER BY p.id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 공지사항 전체 개수 -->
+    <select id="countNoticePosts" resultType="int">
+        SELECT COUNT(*) FROM posts WHERE board_type = 'NOTICE'
+    </select>
+
+    <!-- 자유게시판 전체 개수 -->
+    <select id="countFreeBoardPosts" resultType="int">
+        SELECT COUNT(*) FROM posts WHERE board_type = 'FREE'
+    </select>
 
 </mapper> 

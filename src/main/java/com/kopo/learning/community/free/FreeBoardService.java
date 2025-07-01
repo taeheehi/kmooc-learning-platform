@@ -15,8 +15,9 @@ public class FreeBoardService {
 
     private final PostMapper postMapper;
 
-    public List<Post> getFreeBoardList() {
-        return postMapper.selectPostsByBoardType("FREE");
+    public List<Post> getFreeBoardList(int page, int size) {
+        int offset = (page - 1) * size;
+        return postMapper.selectFreeBoardListWithReplyCount(size, offset);
     }
 
     public Post getPost(Long idx) {
@@ -55,5 +56,9 @@ public class FreeBoardService {
     @Transactional
     public void increaseViewCount(Long idx) {
         postMapper.increaseViewCount(idx);
+    }
+
+    public int countFreeBoardPosts() {
+        return postMapper.countFreeBoardPosts();
     }
 } 

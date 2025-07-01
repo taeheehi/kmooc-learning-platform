@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kopo.learning.community.vo.ReplyMapper">
+
+    <resultMap id="ReplyResultMap" type="com.kopo.learning.community.vo.Reply">
+        <id property="id" column="id"/>
+        <result property="postId" column="post_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="content" column="content"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- 게시글별 댓글 목록 -->
+    <select id="selectRepliesByPostId" resultMap="ReplyResultMap">
+        SELECT id, post_id, user_id, content, created_at, updated_at
+        FROM reply
+        WHERE post_id = #{postId}
+        ORDER BY created_at ASC
+    </select>
+
+    <!-- 게시글별 댓글 목록 (페이징) -->
+    <select id="selectRepliesByPostIdPaged" resultMap="ReplyResultMap">
+        SELECT id, post_id, user_id, content, created_at, updated_at
+        FROM reply
+        WHERE post_id = #{postId}
+        ORDER BY created_at ASC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 게시글별 전체 댓글 수 -->
+    <select id="countRepliesByPostId" resultType="int">
+        SELECT COUNT(*) FROM reply WHERE post_id = #{postId}
+    </select>
+
+    <!-- 댓글 등록 -->
+    <insert id="insertReply" parameterType="com.kopo.learning.community.vo.Reply" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO reply (post_id, user_id, content, created_at, updated_at)
+        VALUES (#{postId}, #{userId}, #{content}, NOW(), NOW())
+    </insert>
+
+    <!-- 댓글 수정 -->
+    <update id="updateReply" parameterType="com.kopo.learning.community.vo.Reply">
+        UPDATE reply
+        SET content = #{content}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 댓글 삭제 -->
+    <delete id="deleteReply">
+        DELETE FROM reply WHERE id = #{id}
+    </delete>
+
+    <!-- 단일 댓글 조회 -->
+    <select id="selectReplyById" resultMap="ReplyResultMap">
+        SELECT id, post_id, user_id, content, created_at, updated_at
+        FROM reply
+        WHERE id = #{id}
+    </select>
+
+</mapper> 

@@ -9,7 +9,7 @@ import java.util.List;
 public interface PostMapper {
     
     // 게시판 타입별 게시글 목록 조회 (최신순)
-    List<Post> selectPostsByBoardType(@Param("boardType") String boardType);
+    List<Post> selectPostsByBoardType(@Param("boardType") String boardType, @Param("limit") int limit, @Param("offset") int offset);
     
     // 게시글 상세 조회
     Post selectPostById(@Param("idx") Long idx);
@@ -25,4 +25,13 @@ public interface PostMapper {
     
     // 조회수 증가
     int increaseViewCount(@Param("idx") Long idx);
+    
+    // 댓글 수 포함 자유게시판 목록
+    List<Post> selectFreeBoardListWithReplyCount(@Param("limit") int limit, @Param("offset") int offset);
+    
+    // 공지사항 전체 개수
+    int countNoticePosts();
+    
+    // 자유게시판 전체 개수
+    int countFreeBoardPosts();
 } 
