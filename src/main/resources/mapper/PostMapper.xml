@@ -136,4 +136,14 @@
         SELECT COUNT(*) FROM posts WHERE board_type = 'FREE'
     </select>
 
+    <!-- 질문게시판 전체 개수 -->
+    <select id="countQnaPosts" resultType="int">
+        SELECT COUNT(*) FROM posts WHERE board_type = 'QNA'
+    </select>
+
+    <!-- 수강후기 전체 개수 -->
+    <select id="countReviewPosts" resultType="int">
+        SELECT COUNT(*) FROM posts WHERE board_type = 'REVIEW'
+    </select>
+
 </mapper> 

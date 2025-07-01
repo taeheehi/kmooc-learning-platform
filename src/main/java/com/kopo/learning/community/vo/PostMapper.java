@@ -34,4 +34,10 @@ public interface PostMapper {
     
     // 자유게시판 전체 개수
     int countFreeBoardPosts();
+    
+    // 질문게시판 전체 개수
+    int countQnaPosts();
+    
+    // 수강후기 전체 개수
+    int countReviewPosts();
 } 
