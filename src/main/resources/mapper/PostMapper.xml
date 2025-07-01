@@ -146,4 +146,24 @@
         SELECT COUNT(*) FROM posts WHERE board_type = 'REVIEW'
     </select>
 
+    <!-- 수강후기 목록 + 댓글수 -->
+    <select id="selectReviewListWithReplyCount" resultMap="PostResultMap">
+        SELECT p.*, 
+               (SELECT COUNT(*) FROM reply r WHERE r.post_id = p.id) AS reply_count
+        FROM posts p
+        WHERE p.board_type = 'REVIEW'
+        ORDER BY p.id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 질문게시판 목록 + 댓글수 -->
+    <select id="selectQnaListWithReplyCount" resultMap="PostResultMap">
+        SELECT p.*, 
+               (SELECT COUNT(*) FROM reply r WHERE r.post_id = p.id) AS reply_count
+        FROM posts p
+        WHERE p.board_type = 'QNA'
+        ORDER BY p.id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
 </mapper> 

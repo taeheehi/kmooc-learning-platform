@@ -40,4 +40,10 @@ public interface PostMapper {
     
     // 수강후기 전체 개수
     int countReviewPosts();
+    
+    // 수강후기 목록 (댓글수 포함)
+    List<Post> selectReviewListWithReplyCount(@Param("limit") int limit, @Param("offset") int offset);
+    
+    // 질문게시판 목록 (댓글수 포함)
+    List<Post> selectQnaListWithReplyCount(@Param("limit") int limit, @Param("offset") int offset);
 } 

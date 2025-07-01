@@ -47,6 +47,39 @@
         </div>
     </div>
 
+    <!-- 댓글 영역 시작 -->
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <input type="hidden" id="post-id" th:value="${post.idx}" />
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <b>댓글</b>
+                    </div>
+                    <div class="card-body" id="reply-list">
+                        <!-- 댓글 목록이 여기에 AJAX로 렌더링됩니다. -->
+                    </div>
+                    <div class="card-footer bg-white">
+                        <form id="reply-form" class="row g-2 align-items-center">
+                            <div class="col-10">
+                                <input type="text" id="reply-content" class="form-control" placeholder="댓글을 입력하세요" maxlength="300" autocomplete="off">
+                            </div>
+                            <div class="col-2 d-grid">
+                                <button type="submit" class="btn btn-primary">등록</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <nav>
+                    <ul class="pagination justify-content-center" id="reply-pagination">
+                        <!-- 페이지네이션이 여기에 AJAX로 렌더링됩니다. -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <!-- 댓글 영역 끝 -->
+
     <!-- 삭제 확인 모달 -->
     <div class="modal fade" id="deleteModal" tabindex="-1">
         <div class="modal-dialog">
@@ -74,6 +107,120 @@
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
             deleteModal.show();
         }
+
+        // ===== 댓글 AJAX =====
+        const postId = document.getElementById('post-id').value;
+        const sessionUserId = /*[[${session.user != null ? session.user.id : ''}]]*/ '';
+        let currentPage = 1;
+        const PAGE_SIZE = 30;
+
+        // 댓글 목록 불러오기
+        function loadReplies(page = 1) {
+            currentPage = page;
+            document.getElementById('reply-list').innerHTML = '<div class="text-center py-3"><div class="spinner-border"></div></div>';
+            fetch(`/review/reply/list?postId=${postId}&page=${page}`)
+                .then(res => res.json())
+                .then(data => {
+                    renderReplies(data.replies, data.page, data.totalPages);
+                });
+        }
+
+        // 댓글 목록 렌더링
+        function renderReplies(replies, page, totalPages) {
+            const userId = sessionUserId;
+            let html = '';
+            if (!replies || replies.length === 0) {
+                html = '<div class="text-center text-muted py-3">등록된 댓글이 없습니다.</div>';
+            } else {
+                html = replies.map(reply => `
+                    <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                        <div>
+                            <b class="me-2">${reply.userId}</b>
+                            <span class="text-muted small">${reply.createdAt ? reply.createdAt.replace('T', ' ').substring(0, 16) : ''}</span>
+                            <div class="mt-1">${escapeHtml(reply.content)}</div>
+                        </div>
+                        <div>
+                            ${userId && userId === reply.userId ? `
+                                <button class="btn btn-sm btn-outline-secondary me-1" onclick="showEditReply(${reply.id}, '${escapeJs(reply.content)}')">수정</button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteReply(${reply.id})">삭제</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('reply-list').innerHTML = html;
+            renderPagination(page, totalPages);
+        }
+
+        // 페이지네이션 렌더링
+        function renderPagination(page, totalPages) {
+            let html = '';
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<li class="page-item${i === page ? ' active' : ''}"><a class="page-link" href="#" onclick="loadReplies(${i});return false;">${i}</a></li>`;
+            }
+            document.getElementById('reply-pagination').innerHTML = html;
+        }
+
+        // 댓글 등록
+        document.getElementById('reply-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const content = document.getElementById('reply-content').value.trim();
+            if (!content) return alert('댓글을 입력하세요.');
+            fetch('/review/reply/add', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `postId=${postId}&content=${encodeURIComponent(content)}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('reply-content').value = '';
+                    loadReplies(1);
+                } else {
+                    alert(data.message || '댓글 등록 실패');
+                }
+            });
+        });
+
+        // 댓글 삭제
+        function deleteReply(replyId) {
+            if (!confirm('댓글을 삭제하시겠습니까?')) return;
+            fetch('/review/reply/delete', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `replyId=${replyId}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) loadReplies(currentPage);
+                else alert('댓글 삭제 실패');
+            });
+        }
+
+        // 댓글 수정 폼 표시 (생략: 자유게시판과 동일하게 추가 가능)
+        // ...
+
+        // HTML 이스케이프 함수
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/[&<>"']/g, function(m) {
+                return ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                })[m];
+            });
+        }
+        // JS 이스케이프 함수 (수정폼에 사용)
+        function escapeJs(text) {
+            if (!text) return '';
+            return text.replace(/'/g, "\\'").replace(/"/g, '\\"');
+        }
+
+        // 페이지 진입 시 댓글 목록 로드
+        loadReplies();
     </script>
 </body>
 </html> 
