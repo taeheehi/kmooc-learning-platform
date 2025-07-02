@@ -15,6 +15,7 @@ import java.util.List;
 public class FreeBoardController {
 
     private final FreeBoardService freeBoardService;
+    private final FreeBoardReplyService freeBoardReplyService;
 
     @GetMapping("/board")
     public String freeBoard(Model model, @RequestParam(defaultValue = "1") int page) {
@@ -49,6 +50,8 @@ public class FreeBoardController {
         Post post = freeBoardService.getPost(idx);
         freeBoardService.increaseViewCount(idx);
         model.addAttribute("post", post);
+        List<com.kopo.learning.community.vo.Reply> replies = freeBoardReplyService.getRepliesByPostId(idx);
+        model.addAttribute("replies", replies);
         return "community/board_view";
     }
 
@@ -60,7 +63,7 @@ public class FreeBoardController {
             return "redirect:/login";
         }
         Post post = freeBoardService.getPost(idx);
-        if (!post.getAuthorId().equals(user.getIdx())) {
+        if (!post.getAuthorId().equals(user.getId())) {
             return "redirect:/community/board";
         }
         model.addAttribute("post", post);
@@ -76,7 +79,7 @@ public class FreeBoardController {
             return "redirect:/login";
         }
         Post post = freeBoardService.getPost(idx);
-        if (!post.getAuthorId().equals(user.getIdx())) {
+        if (!post.getAuthorId().equals(user.getId())) {
             return "redirect:/community/board";
         }
         freeBoardService.updatePost(idx, title, content);
@@ -90,7 +93,7 @@ public class FreeBoardController {
             return "redirect:/login";
         }
         Post post = freeBoardService.getPost(idx);
-        if (!post.getAuthorId().equals(user.getIdx())) {
+        if (!post.getAuthorId().equals(user.getId())) {
             return "redirect:/community/board";
         }
         freeBoardService.deletePost(idx);
