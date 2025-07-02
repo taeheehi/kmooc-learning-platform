@@ -1,1 +1,180 @@
- 
+body {
+    font-family: 'Noto Sans KR', Arial, sans-serif;
+    background-color: #f7f7f7;
+}
+h2 {
+    margin-bottom: 24px;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+.mypage-container {
+    max-width: 480px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 36px 32px 28px 32px;
+    border-radius: 18px;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.10);
+}
+.section {
+    margin-bottom: 32px;
+    border-top: none;
+    padding-top: 0;
+}
+.section-title {
+    font-size: 1.18rem;
+    margin-bottom: 22px;
+    font-weight: 700;
+    color: #4169e1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.section-title .icon {
+    font-size: 1.2em;
+}
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 18px;
+}
+.input-group {
+    display: flex;
+    width: 360px;
+}
+.input-group input[type="email"] {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+    height: 44px;
+}
+.input-group .email-verify-btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    background: #f3f6fa;
+    color: #4169e1;
+    border: 1.5px solid #d1d5db;
+    border-left: none;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0 16px;
+    margin: 0;
+    width: auto;
+    min-width: 90px;
+    height: 44px;
+    line-height: 44px;
+    white-space: nowrap;
+    transition: background 0.2s, color 0.2s;
+}
+.input-group .email-verify-btn:hover {
+    background: #eaf0fb;
+    color: #2746a0;
+}
+.form-row label {
+    font-weight: 600;
+    margin-bottom: 2px;
+    color: #222;
+}
+.form-row input,
+.form-row select {
+    width: 360px;
+    padding: 10px 12px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 7px;
+    font-size: 1rem;
+    background: #fafbfc;
+    transition: border 0.2s;
+    box-sizing: border-box;
+}
+.form-row input:focus,
+.form-row select:focus {
+    border: 1.5px solid #4169e1;
+    outline: none;
+    background: #fff;
+}
+.button {
+    background: linear-gradient(90deg, #4169e1 60%, #5a8dee 100%);
+    color: white;
+    border: none;
+    padding: 10px 0;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 1.05rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(65,105,225,0.07);
+    transition: background 0.2s, box-shadow 0.2s;
+    width: 100%;
+    margin-top: 18px;
+    display: block;
+}
+.button:hover {
+    background: linear-gradient(90deg, #365ac0 60%, #4169e1 100%);
+    box-shadow: 0 4px 16px rgba(65,105,225,0.13);
+}
+.status-info p {
+    margin: 8px 0;
+}
+.profile-img {
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+.msg {
+    color: #e74c3c;
+    margin-top: 18px;
+    text-align: center;
+    font-weight: 500;
+}
+select[name="gender"] {
+    min-width: 0;
+    width: 360px !important;
+    box-sizing: border-box;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: #fafbfc url('data:image/svg+xml;utf8,<svg fill="#4169e1" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 12px center/20px 20px;
+    padding-right: 38px;
+}
+@media (min-width: 480px) {
+    .form-row .email-verify-btn {
+        width: auto;
+        margin-left: 10px;
+        margin-top: 0;
+    }
+    .form-row {
+        flex-direction: row;
+        align-items: center;
+    }
+    .form-row label {
+        width: 120px;
+        margin-bottom: 0;
+    }
+    .form-row input,
+    .form-row select {
+        width: 360px;
+    }
+    select[name="gender"] {
+        width: 360px !important;
+    }
+    .input-group {
+        width: 360px;
+    }
+}
+@media (max-width: 479px) {
+    .input-group {
+        flex-direction: column;
+    }
+    .input-group .email-verify-btn {
+        border-radius: 7px;
+        border-left: 1.5px solid #d1d5db;
+        margin-top: 6px;
+        width: 100%;
+    }
+    .input-group input[type="email"] {
+        border-radius: 7px;
+        border-right: 1.5px solid #d1d5db;
+    }
+} 

@@ -18,4 +18,65 @@
 /* 네비게이션 바의 모든 링크를 굵게 표시 */
 .navbar-nav .nav-link {
   font-weight: bold !important;
+}
+
+body {
+    margin: 0;
+    background-color: #f7f7f7;
+    font-family: Arial, sans-serif;
+}
+header {
+    width: 100%;
+    background-color: #fff;
+    padding: 20px 40px;
+    border-bottom: 1px solid #eee;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+}
+.main-nav {
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+}
+.content-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+}
+nav ul li a {
+    color: #222;
+    text-decoration: none;
+    padding: 10px 20px;
+    display: block;
+}
+.submenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #fff;
+    min-width: 180px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 4px;
+    padding: 8px 0;
+    z-index: 10;
+}
+.submenu li {
+    list-style: none;
+    margin: 0;
+    font-weight: normal;
+}
+.submenu li a {
+    display: block;
+    padding: 10px 20px;
+    color: #4169e1;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
+    font-weight: bold;
+}
+.submenu li a:hover {
+    background-color: #f0f0f0;
+    color: #4169e1;
+}
+nav ul > li:hover .submenu {
+    display: block;
 } 
