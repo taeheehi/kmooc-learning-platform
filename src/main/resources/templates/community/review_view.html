@@ -16,7 +16,7 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h4 class="mb-0" th:text="${post.title}">제목</h4>
-                            <div th:if="${session.user != null and session.user.idx == post.authorId}">
+                            <div th:if="${session.user != null and session.user.id == post.authorId}">
                                 <a th:href="@{/community/review/{idx}/edit(idx=${post.idx})}" class="btn btn-sm btn-outline-primary me-2">수정</a>
                                 <button type="button" class="btn btn-sm btn-outline-danger" onclick="deletePost()">삭제</button>
                             </div>
@@ -101,6 +101,10 @@
         </div>
     </div>
 
+    <!-- ✅ 로그인 사용자 ID를 JS 변수로 안전하게 전달 -->
+    <script th:inline="javascript">
+        var sessionUserId = /*[['' + (${session.user != null ? session.user.id : ''}) + '']]*/ '';
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function deletePost() {
@@ -108,13 +112,9 @@
             deleteModal.show();
         }
 
-        // ===== 댓글 AJAX =====
         const postId = document.getElementById('post-id').value;
-        const sessionUserId = /*[[${session.user != null ? session.user.id : ''}]]*/ '';
         let currentPage = 1;
-        const PAGE_SIZE = 30;
 
-        // 댓글 목록 불러오기
         function loadReplies(page = 1) {
             currentPage = page;
             document.getElementById('reply-list').innerHTML = '<div class="text-center py-3"><div class="spinner-border"></div></div>';
@@ -125,9 +125,7 @@
                 });
         }
 
-        // 댓글 목록 렌더링
         function renderReplies(replies, page, totalPages) {
-            const userId = sessionUserId;
             let html = '';
             if (!replies || replies.length === 0) {
                 html = '<div class="text-center text-muted py-3">등록된 댓글이 없습니다.</div>';
@@ -140,10 +138,12 @@
                             <div class="mt-1">${escapeHtml(reply.content)}</div>
                         </div>
                         <div>
-                            ${userId && userId === reply.userId ? `
-                                <button class="btn btn-sm btn-outline-secondary me-1" onclick="showEditReply(${reply.id}, '${escapeJs(reply.content)}')">수정</button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteReply(${reply.id})">삭제</button>
-                            ` : ''}
+                            ${sessionUserId && sessionUserId === reply.userId
+                                ? `<button class="btn btn-sm btn-outline-secondary me-1 edit-reply-btn" 
+                                        data-reply-id="${reply.id}" 
+                                        data-reply-content=${JSON.stringify(reply.content)}>수정</button>
+                                   <button class="btn btn-sm btn-outline-danger" onclick="deleteReply(${reply.id})">삭제</button>`
+                                : ''}
                         </div>
                     </div>
                 `).join('');
@@ -152,7 +152,6 @@
             renderPagination(page, totalPages);
         }
 
-        // 페이지네이션 렌더링
         function renderPagination(page, totalPages) {
             let html = '';
             for (let i = 1; i <= totalPages; i++) {
@@ -161,7 +160,6 @@
             document.getElementById('reply-pagination').innerHTML = html;
         }
 
-        // 댓글 등록
         document.getElementById('reply-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const content = document.getElementById('reply-content').value.trim();
@@ -182,7 +180,6 @@
             });
         });
 
-        // 댓글 삭제
         function deleteReply(replyId) {
             if (!confirm('댓글을 삭제하시겠습니까?')) return;
             fetch('/review/reply/delete', {
@@ -197,30 +194,46 @@
             });
         }
 
-        // 댓글 수정 폼 표시 (생략: 자유게시판과 동일하게 추가 가능)
-        // ...
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('edit-reply-btn')) {
+                const replyId = e.target.getAttribute('data-reply-id');
+                const content = e.target.getAttribute('data-reply-content');
+                const replyDiv = e.target.closest('.d-flex');
+                if (!replyDiv) return;
+                replyDiv.querySelector('div.mt-1').innerHTML = `
+                    <form onsubmit="submitEditReply(event, ${replyId})" class="d-flex align-items-center mt-1" style="gap:10px;">
+                        <input type="text" class="form-control flex-grow-1" style="min-width:300px;" value="${escapeHtml(content)}" maxlength="300">
+                        <button class="btn btn-success btn-sm" style="white-space:nowrap;">저장</button>
+                    </form>`;
+            }
+        });
 
-        // HTML 이스케이프 함수
-        function escapeHtml(text) {
-            if (!text) return '';
-            return text.replace(/[&<>"']/g, function(m) {
-                return ({
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    '"': '&quot;',
-                    "'": '&#39;'
-                })[m];
+        function submitEditReply(e, replyId) {
+            e.preventDefault();
+            const content = e.target.querySelector('input').value.trim();
+            if (!content) return alert('수정할 내용을 입력하세요.');
+            fetch('/review/reply/update', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `replyId=${replyId}&content=${encodeURIComponent(content)}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) loadReplies(currentPage);
+                else alert('댓글 수정 실패');
             });
         }
-        // JS 이스케이프 함수 (수정폼에 사용)
-        function escapeJs(text) {
-            if (!text) return '';
-            return text.replace(/'/g, "\\'").replace(/"/g, '\\"');
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>"']/g, function(tag) {
+                const chars = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'};
+                return chars[tag] || tag;
+            });
         }
 
-        // 페이지 진입 시 댓글 목록 로드
-        loadReplies();
+        document.addEventListener('DOMContentLoaded', function() {
+            loadReplies(1);
+        });
     </script>
 </body>
 </html> 
