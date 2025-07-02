@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>내 학습 공간</title>
+    <link rel="stylesheet" href="/css/student/learning-space.css">
+</head>
+<body>
+    <!-- 공통 헤더 -->
+    <div th:replace="~{common/header :: header}"></div>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>내 학습 공간</h1>
+            <p>나만의 학습 여정을 관리하고 계획해보세요</p>
+        </div>
+        
+        <!-- 탭 네비게이션 -->
+        <div class="tab-navigation">
+            <button class="tab-button active" onclick="showTab('current-courses')">현재 수강</button>
+            <button class="tab-button" onclick="showTab('my-plan')">나의 계획</button>
+        </div>
+        
+        <!-- 현재 수강 탭 -->
+        <div id="current-courses" class="tab-content active">
+            <div class="section-header">
+                <h2>현재 수강 중인 강의</h2>
+                <p>진행률과 수료증을 확인하세요</p>
+            </div>
+            
+            <div class="course-grid">
+                <!-- 수강 중인 강의 카드 예시 -->
+                <div class="course-card">
+                    <div class="course-thumbnail">
+                        <img src="/images/course-thumbnail1.jpg" alt="강의 썸네일" onerror="this.src='/images/no-image.png';">
+                        <div class="progress-overlay">
+                            <div class="progress-circle">
+                                <span class="progress-text">75%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="course-info">
+                        <h3 class="course-title">파이썬 기초 프로그래밍</h3>
+                        <p class="course-instructor">김교수</p>
+                        <div class="course-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 75%"></div>
+                            </div>
+                            <span class="progress-percentage">75% 완료</span>
+                        </div>
+                        <div class="course-actions">
+                            <button class="btn btn-primary">학습 계속하기</button>
+                            <button class="btn btn-secondary">수료증 발급</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="course-card">
+                    <div class="course-thumbnail">
+                        <img src="/images/course-thumbnail2.jpg" alt="강의 썸네일" onerror="this.src='/images/no-image.png';">
+                        <div class="progress-overlay">
+                            <div class="progress-circle completed">
+                                <span class="progress-text">100%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="course-info">
+                        <h3 class="course-title">웹 개발 기초</h3>
+                        <p class="course-instructor">이교수</p>
+                        <div class="course-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill completed" style="width: 100%"></div>
+                            </div>
+                            <span class="progress-percentage completed">수료 완료</span>
+                        </div>
+                        <div class="course-actions">
+                            <button class="btn btn-primary">다시 보기</button>
+                            <button class="btn btn-success">수료증 발급</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="course-card">
+                    <div class="course-thumbnail">
+                        <img src="/images/course-thumbnail3.jpg" alt="강의 썸네일" onerror="this.src='/images/no-image.png';">
+                        <div class="progress-overlay">
+                            <div class="progress-circle">
+                                <span class="progress-text">30%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="course-info">
+                        <h3 class="course-title">데이터 분석 입문</h3>
+                        <p class="course-instructor">박교수</p>
+                        <div class="course-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 30%"></div>
+                            </div>
+                            <span class="progress-percentage">30% 완료</span>
+                        </div>
+                        <div class="course-actions">
+                            <button class="btn btn-primary">학습 계속하기</button>
+                            <button class="btn btn-secondary" disabled>수료증 발급</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 나의 계획 탭 -->
+        <div id="my-plan" class="tab-content">
+            <div class="section-header">
+                <h2>나의 학습 계획</h2>
+                <p>찜한 강의와 맞춤형 학습 로드맵을 확인하세요</p>
+            </div>
+            
+            <!-- 찜한 강의 섹션 -->
+            <div class="wishlist-section">
+                <h3>찜한 강의 목록</h3>
+                <div class="wishlist-grid">
+                    <div class="wishlist-card">
+                        <img src="/images/course-thumbnail4.jpg" alt="강의 썸네일" onerror="this.src='/images/no-image.png';">
+                        <div class="wishlist-info">
+                            <h4>머신러닝 기초</h4>
+                            <p>최교수</p>
+                            <button class="btn btn-primary">수강 신청</button>
+                        </div>
+                    </div>
+                    
+                    <div class="wishlist-card">
+                        <img src="/images/course-thumbnail5.jpg" alt="강의 썸네일" onerror="this.src='/images/no-image.png';">
+                        <div class="wishlist-info">
+                            <h4>알고리즘과 자료구조</h4>
+                            <p>정교수</p>
+                            <button class="btn btn-primary">수강 신청</button>
+                        </div>
+                    </div>
+                    
+                    <div class="wishlist-card">
+                        <img src="/images/course-thumbnail6.jpg" alt="강의 썸네일" onerror="this.src='/images/no-image.png';">
+                        <div class="wishlist-info">
+                            <h4>클라우드 컴퓨팅</h4>
+                            <p>한교수</p>
+                            <button class="btn btn-primary">수강 신청</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 맞춤형 학습 로드맵 섹션 -->
+            <div class="roadmap-section">
+                <h3>맞춤형 학습 로드맵</h3>
+                <div class="roadmap-container">
+                    <div class="roadmap-path">
+                        <div class="roadmap-step completed">
+                            <div class="step-icon">✓</div>
+                            <div class="step-content">
+                                <h4>기초 단계</h4>
+                                <p>파이썬 기초 프로그래밍</p>
+                                <span class="step-status">완료</span>
+                            </div>
+                        </div>
+                        
+                        <div class="roadmap-step completed">
+                            <div class="step-icon">✓</div>
+                            <div class="step-content">
+                                <h4>웹 개발 기초</h4>
+                                <p>HTML, CSS, JavaScript</p>
+                                <span class="step-status">완료</span>
+                            </div>
+                        </div>
+                        
+                        <div class="roadmap-step current">
+                            <div class="step-icon">●</div>
+                            <div class="step-content">
+                                <h4>데이터 분석</h4>
+                                <p>데이터 분석 입문</p>
+                                <span class="step-status">진행 중</span>
+                            </div>
+                        </div>
+                        
+                        <div class="roadmap-step">
+                            <div class="step-icon">○</div>
+                            <div class="step-content">
+                                <h4>고급 단계</h4>
+                                <p>머신러닝 기초</p>
+                                <span class="step-status">예정</span>
+                            </div>
+                        </div>
+                        
+                        <div class="roadmap-step">
+                            <div class="step-icon">○</div>
+                            <div class="step-content">
+                                <h4>전문가 단계</h4>
+                                <p>딥러닝 심화</p>
+                                <span class="step-status">예정</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="roadmap-actions">
+                    <button class="btn btn-primary">로드맵 수정하기</button>
+                    <button class="btn btn-secondary">새로운 로드맵 생성</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showTab(tabName) {
+            // 모든 탭 콘텐츠 숨기기
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 모든 탭 버튼 비활성화
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // 선택된 탭 보이기
+            document.getElementById(tabName).classList.add('active');
+            
+            // 선택된 탭 버튼 활성화
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kopo.learning.instructor.InstructorCourseMapper">
+    
+    <resultMap id="InstructorCourseResultMap" type="com.kopo.learning.common.vo.InstructorCourse">
+        <id property="id" column="id"/>
+        <result property="instructorId" column="instructor_id"/>
+        <result property="courseName" column="course_name"/>
+        <result property="description" column="description"/>
+        <result property="category" column="category"/>
+        <result property="thumbnailUrl" column="thumbnail_url"/>
+        <result property="videoUrl" column="video_url"/>
+        <result property="totalWeeks" column="total_weeks"/>
+        <result property="totalHours" column="total_hours"/>
+        <result property="difficulty" column="difficulty"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="enrollmentCount" column="enrollment_count"/>
+        <result property="averageRating" column="average_rating"/>
+        <result property="reviewCount" column="review_count"/>
+    </resultMap>
+    
+    <!-- 모든 강의 조회 (관리자용) -->
+    <select id="findAll" resultMap="InstructorCourseResultMap">
+        SELECT 
+            ic.id,
+            ic.instructor_id,
+            ic.course_name,
+            ic.description,
+            ic.category,
+            ic.thumbnail_url,
+            ic.video_url,
+            ic.total_weeks,
+            ic.total_hours,
+            ic.difficulty,
+            ic.status,
+            ic.created_at,
+            ic.updated_at,
+            COALESCE(e.enrollment_count, 0) as enrollment_count,
+            COALESCE(r.average_rating, 0.0) as average_rating,
+            COALESCE(r.review_count, 0) as review_count
+        FROM instructor_courses ic
+        LEFT JOIN (
+            SELECT course_id, COUNT(*) as enrollment_count
+            FROM enrollments 
+            WHERE status IN ('ENROLLED', 'IN_PROGRESS', 'COMPLETED')
+            GROUP BY course_id
+        ) e ON ic.id = e.course_id
+        LEFT JOIN (
+            SELECT course_id, AVG(rating) as average_rating, COUNT(*) as review_count
+            FROM reviews
+            GROUP BY course_id
+        ) r ON ic.id = r.course_id
+        ORDER BY ic.created_at DESC
+    </select>
+    
+    <!-- 특정 상태의 모든 강의 조회 (관리자용) -->
+    <select id="findByStatus" resultMap="InstructorCourseResultMap">
+        SELECT 
+            ic.id,
+            ic.instructor_id,
+            ic.course_name,
+            ic.description,
+            ic.category,
+            ic.thumbnail_url,
+            ic.video_url,
+            ic.total_weeks,
+            ic.total_hours,
+            ic.difficulty,
+            ic.status,
+            ic.created_at,
+            ic.updated_at,
+            COALESCE(e.enrollment_count, 0) as enrollment_count,
+            COALESCE(r.average_rating, 0.0) as average_rating,
+            COALESCE(r.review_count, 0) as review_count
+        FROM instructor_courses ic
+        LEFT JOIN (
+            SELECT course_id, COUNT(*) as enrollment_count
+            FROM enrollments 
+            WHERE status IN ('ENROLLED', 'IN_PROGRESS', 'COMPLETED')
+            GROUP BY course_id
+        ) e ON ic.id = e.course_id
+        LEFT JOIN (
+            SELECT course_id, AVG(rating) as average_rating, COUNT(*) as review_count
+            FROM reviews
+            GROUP BY course_id
+        ) r ON ic.id = r.course_id
+        WHERE ic.status = #{status}
+        ORDER BY ic.created_at DESC
+    </select>
+    
+    <!-- 강의자의 모든 강의 조회 -->
+    <select id="findByInstructorId" resultMap="InstructorCourseResultMap">
+        SELECT 
+            ic.id,
+            ic.instructor_id,
+            ic.course_name,
+            ic.description,
+            ic.category,
+            ic.thumbnail_url,
+            ic.video_url,
+            ic.total_weeks,
+            ic.total_hours,
+            ic.difficulty,
+            ic.status,
+            ic.created_at,
+            ic.updated_at,
+            COALESCE(e.enrollment_count, 0) as enrollment_count,
+            COALESCE(r.average_rating, 0.0) as average_rating,
+            COALESCE(r.review_count, 0) as review_count
+        FROM instructor_courses ic
+        LEFT JOIN (
+            SELECT course_id, COUNT(*) as enrollment_count
+            FROM enrollments 
+            WHERE status IN ('ENROLLED', 'IN_PROGRESS', 'COMPLETED')
+            GROUP BY course_id
+        ) e ON ic.id = e.course_id
+        LEFT JOIN (
+            SELECT course_id, AVG(rating) as average_rating, COUNT(*) as review_count
+            FROM reviews
+            GROUP BY course_id
+        ) r ON ic.id = r.course_id
+        WHERE ic.instructor_id = #{instructorId}
+        ORDER BY ic.created_at DESC
+    </select>
+    
+    <!-- 강의자의 특정 상태 강의 조회 -->
+    <select id="findByInstructorIdAndStatus" resultMap="InstructorCourseResultMap">
+        SELECT 
+            ic.id,
+            ic.instructor_id,
+            ic.course_name,
+            ic.description,
+            ic.category,
+            ic.thumbnail_url,
+            ic.video_url,
+            ic.total_weeks,
+            ic.total_hours,
+            ic.difficulty,
+            ic.status,
+            ic.created_at,
+            ic.updated_at,
+            COALESCE(e.enrollment_count, 0) as enrollment_count,
+            COALESCE(r.average_rating, 0.0) as average_rating,
+            COALESCE(r.review_count, 0) as review_count
+        FROM instructor_courses ic
+        LEFT JOIN (
+            SELECT course_id, COUNT(*) as enrollment_count
+            FROM enrollments 
+            WHERE status IN ('ENROLLED', 'IN_PROGRESS', 'COMPLETED')
+            GROUP BY course_id
+        ) e ON ic.id = e.course_id
+        LEFT JOIN (
+            SELECT course_id, AVG(rating) as average_rating, COUNT(*) as review_count
+            FROM reviews
+            GROUP BY course_id
+        ) r ON ic.id = r.course_id
+        WHERE ic.instructor_id = #{instructorId} AND ic.status = #{status}
+        ORDER BY ic.created_at DESC
+    </select>
+    
+    <!-- 강의 상세 조회 -->
+    <select id="findById" resultMap="InstructorCourseResultMap">
+        SELECT 
+            ic.id,
+            ic.instructor_id,
+            ic.course_name,
+            ic.description,
+            ic.category,
+            ic.thumbnail_url,
+            ic.video_url,
+            ic.total_weeks,
+            ic.total_hours,
+            ic.difficulty,
+            ic.status,
+            ic.created_at,
+            ic.updated_at,
+            COALESCE(e.enrollment_count, 0) as enrollment_count,
+            COALESCE(r.average_rating, 0.0) as average_rating,
+            COALESCE(r.review_count, 0) as review_count
+        FROM instructor_courses ic
+        LEFT JOIN (
+            SELECT course_id, COUNT(*) as enrollment_count
+            FROM enrollments 
+            WHERE status IN ('ENROLLED', 'IN_PROGRESS', 'COMPLETED')
+            GROUP BY course_id
+        ) e ON ic.id = e.course_id
+        LEFT JOIN (
+            SELECT course_id, AVG(rating) as average_rating, COUNT(*) as review_count
+            FROM reviews
+            GROUP BY course_id
+        ) r ON ic.id = r.course_id
+        WHERE ic.id = #{id}
+    </select>
+    
+    <!-- 강의 등록 -->
+    <insert id="save" parameterType="com.kopo.learning.common.vo.InstructorCourse" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO instructor_courses (
+            instructor_id,
+            course_name,
+            description,
+            category,
+            thumbnail_url,
+            video_url,
+            total_weeks,
+            total_hours,
+            difficulty,
+            status,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{instructorId},
+            #{courseName},
+            #{description},
+            #{category},
+            #{thumbnailUrl},
+            #{videoUrl},
+            #{totalWeeks},
+            #{totalHours},
+            #{difficulty},
+            #{status},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+    
+    <!-- 강의 수정 -->
+    <update id="update" parameterType="com.kopo.learning.common.vo.InstructorCourse">
+        UPDATE instructor_courses SET
+            course_name = #{courseName},
+            description = #{description},
+            category = #{category},
+            thumbnail_url = #{thumbnailUrl},
+            video_url = #{videoUrl},
+            total_weeks = #{totalWeeks},
+            total_hours = #{totalHours},
+            difficulty = #{difficulty},
+            status = #{status},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 강의 상태 변경 -->
+    <update id="updateStatus">
+        UPDATE instructor_courses SET
+            status = #{status},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 강의 삭제 -->
+    <delete id="delete">
+        DELETE FROM instructor_courses WHERE id = #{id}
+    </delete>
+    
+    <!-- 강의별 수강생 수 조회 -->
+    <select id="countEnrollmentsByCourseId" resultType="int">
+        SELECT COUNT(*) FROM enrollments 
+        WHERE course_id = #{courseId} AND status IN ('ENROLLED', 'IN_PROGRESS', 'COMPLETED')
+    </select>
+    
+    <!-- 강의별 평균 평점 조회 -->
+    <select id="getAverageRatingByCourseId" resultType="double">
+        SELECT COALESCE(AVG(rating), 0.0) FROM reviews WHERE course_id = #{courseId}
+    </select>
+    
+    <!-- 강의별 리뷰 수 조회 -->
+    <select id="countReviewsByCourseId" resultType="int">
+        SELECT COUNT(*) FROM reviews WHERE course_id = #{courseId}
+    </select>
+    
+</mapper> 

@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>강의 등록</title>
+    <title>강의 수정</title>
     <link rel="stylesheet" href="/css/instructor/course_add.css">
 </head>
 <body>
@@ -11,24 +11,24 @@
     
     <div class="container">
         <div class="page-header">
-            <h1>새 강의 등록</h1>
-            <p>새로운 강의를 등록해 주세요.</p>
+            <h1>강의 수정</h1>
+            <p>강의 정보를 수정해 주세요.</p>
         </div>
         
         <div class="form-container">
-            <form th:action="@{/course/add}" method="post" enctype="multipart/form-data">
+            <form th:action="@{/course/edit/{id}(id=${course.id})}" method="post" enctype="multipart/form-data">
                 <div class="form-section">
                     <h3>기본 정보</h3>
                     
                     <div class="form-group">
                         <label for="courseName">강의명 *</label>
                         <input type="text" id="courseName" name="courseName" required 
-                               placeholder="강의명을 입력하세요">
+                               placeholder="강의명을 입력하세요" th:value="${course.courseName}">
                     </div>
                     
                     <div class="form-group">
                         <label for="category">카테고리 *</label>
-                        <select id="category" name="category" required>
+                        <select id="category" name="category" required th:value="${course.category}">
                             <option value="">카테고리를 선택하세요</option>
                             <option value="프로그래밍">프로그래밍</option>
                             <option value="데이터과학">데이터과학</option>
@@ -44,7 +44,7 @@
                     <div class="form-group">
                         <label for="description">강의 설명 *</label>
                         <textarea id="description" name="description" rows="5" required
-                                  placeholder="강의에 대한 상세한 설명을 입력하세요"></textarea>
+                                  placeholder="강의에 대한 상세한 설명을 입력하세요" th:text="${course.description}"></textarea>
                     </div>
                 </div>
                 
@@ -55,19 +55,19 @@
                         <div class="form-group">
                             <label for="totalWeeks">총 주차 *</label>
                             <input type="number" id="totalWeeks" name="totalWeeks" min="1" max="52" required
-                                   placeholder="예: 12">
+                                   placeholder="예: 12" th:value="${course.totalWeeks}">
                         </div>
                         
                         <div class="form-group">
                             <label for="totalHours">총 강의 시간 (시간) *</label>
                             <input type="number" id="totalHours" name="totalHours" min="1" max="200" required
-                                   placeholder="예: 24">
+                                   placeholder="예: 24" th:value="${course.totalHours}">
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label for="difficulty">난이도 *</label>
-                        <select id="difficulty" name="difficulty" required>
+                        <select id="difficulty" name="difficulty" required th:value="${course.difficulty}">
                             <option value="">난이도를 선택하세요</option>
                             <option value="BEGINNER">초급</option>
                             <option value="INTERMEDIATE">중급</option>
@@ -82,14 +82,14 @@
                     <div class="form-group">
                         <label for="thumbnailUrl">썸네일 이미지 URL</label>
                         <input type="url" id="thumbnailUrl" name="thumbnailUrl" 
-                               placeholder="https://example.com/image.jpg">
+                               placeholder="https://example.com/image.jpg" th:value="${course.thumbnailUrl}">
                         <small>강의를 대표하는 이미지의 URL을 입력하세요</small>
                     </div>
                     
                     <div class="form-group">
                         <label for="videoUrl">강의 영상 URL</label>
                         <input type="url" id="videoUrl" name="videoUrl" 
-                               placeholder="https://youtube.com/watch?v=...">
+                               placeholder="https://youtube.com/watch?v=..." th:value="${course.videoUrl}">
                         <small>강의 소개 영상의 URL을 입력하세요</small>
                     </div>
                 </div>
@@ -99,7 +99,7 @@
                     
                     <div class="form-group">
                         <label for="status">강의 상태</label>
-                        <select id="status" name="status">
+                        <select id="status" name="status" th:value="${course.status}">
                             <option value="DRAFT">임시저장</option>
                             <option value="PUBLISHED">공개</option>
                         </select>
@@ -109,7 +109,7 @@
                 
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="history.back()">취소</button>
-                    <button type="submit" class="btn btn-primary">강의 등록</button>
+                    <button type="submit" class="btn btn-primary">강의 수정</button>
                 </div>
             </form>
         </div>

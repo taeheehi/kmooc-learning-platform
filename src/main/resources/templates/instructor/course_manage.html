@@ -1,1 +1,186 @@
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>강의 관리</title><link rel="stylesheet" href="/css/instructor/course_manage.css"></head><body><h1>강의 관리 페이지</h1></body></html> 
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>강의 관리</title>
+    <link rel="stylesheet" href="/css/instructor/course_manage.css">
+</head>
+<body>
+    <!-- 공통 헤더 -->
+    <div th:replace="~{common/header :: header}"></div>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>강의 관리</h1>
+            <p>등록한 강의를 관리하고 수강생 현황을 확인하세요</p>
+        </div>
+        
+        <!-- 대시보드 통계 -->
+        <div class="dashboard-stats" th:if="${stats}">
+            <div class="stat-card">
+                <div class="stat-icon">📚</div>
+                <div class="stat-content">
+                    <h3 th:text="${stats.totalCourses}">0</h3>
+                    <p>전체 강의</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-content">
+                    <h3 th:text="${stats.publishedCourses}">0</h3>
+                    <p>공개 강의</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-content">
+                    <h3 th:text="${stats.totalEnrollments}">0</h3>
+                    <p>총 수강생</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-content">
+                    <h3 th:text="${stats.averageRating}">0.0</h3>
+                    <p>평균 평점</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 액션 버튼 -->
+        <div class="action-bar">
+            <a href="/course/add" class="btn btn-primary">새 강의 등록</a>
+            <a href="/course/students" class="btn btn-secondary">수강생 관리</a>
+        </div>
+        
+        <!-- 강의 목록 -->
+        <div class="course-list">
+            <div class="list-header">
+                <h2>내 강의 목록</h2>
+                <div class="filter-tabs">
+                    <button class="filter-tab active" onclick="filterCourses('all')">전체</button>
+                    <button class="filter-tab" onclick="filterCourses('PUBLISHED')">공개</button>
+                    <button class="filter-tab" onclick="filterCourses('DRAFT')">임시저장</button>
+                </div>
+            </div>
+            
+            <div class="course-grid">
+                <div th:each="course : ${courses}" class="course-card" th:data-status="${course.status}">
+                    <div class="course-thumbnail">
+                        <img th:src="${course.thumbnailUrl}" alt="강의 썸네일" 
+                             onerror="this.src='/images/no-image.png';">
+                        <div class="status-badge" th:text="${course.status == 'PUBLISHED' ? '공개' : '임시저장'}">상태</div>
+                    </div>
+                    
+                    <div class="course-info">
+                        <h3 class="course-title" th:text="${course.courseName}">강의명</h3>
+                        <p class="course-category" th:text="${course.category}">카테고리</p>
+                        <p class="course-description" th:text="${course.description}">강의 설명</p>
+                        
+                        <div class="course-stats">
+                            <div class="stat">
+                                <span class="stat-label">수강생</span>
+                                <span class="stat-value" th:text="${course.enrollmentCount != null ? course.enrollmentCount : 0}">0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">평점</span>
+                                <span class="stat-value" th:text="${course.averageRating != null ? course.averageRating : '0.0'}">0.0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">리뷰</span>
+                                <span class="stat-value" th:text="${course.reviewCount != null ? course.reviewCount : 0}">0</span>
+                            </div>
+                        </div>
+                        
+                        <div class="course-meta">
+                            <span class="meta-item">
+                                <i class="icon">📅</i>
+                                <span th:text="${course.totalWeeks + '주'}">12주</span>
+                            </span>
+                            <span class="meta-item">
+                                <i class="icon">⏱️</i>
+                                <span th:text="${course.totalHours + '시간'}">24시간</span>
+                            </span>
+                            <span class="meta-item">
+                                <i class="icon">📊</i>
+                                <span th:text="${course.difficulty == 'BEGINNER' ? '초급' : (course.difficulty == 'INTERMEDIATE' ? '중급' : '고급')}">난이도</span>
+                            </span>
+                        </div>
+                        
+                        <div class="course-actions">
+                            <a th:href="@{/course/edit/{id}(id=${course.id})}" class="btn btn-outline">수정</a>
+                            <a th:href="@{/course/students/{id}(id=${course.id})}" class="btn btn-outline">수강생</a>
+                            
+                            <div class="dropdown">
+                                <button class="btn btn-outline dropdown-toggle">더보기</button>
+                                <div class="dropdown-menu">
+                                    <form th:action="@{/course/status/{id}(id=${course.id})}" method="post" style="display: inline;">
+                                        <input type="hidden" name="status" value="PUBLISHED">
+                                        <button type="submit" class="dropdown-item" 
+                                                th:if="${course.status != 'PUBLISHED'}">공개하기</button>
+                                    </form>
+                                    <form th:action="@{/course/status/{id}(id=${course.id})}" method="post" style="display: inline;">
+                                        <input type="hidden" name="status" value="DRAFT">
+                                        <button type="submit" class="dropdown-item" 
+                                                th:if="${course.status != 'DRAFT'}">임시저장</button>
+                                    </form>
+                                    <form th:action="@{/course/delete/{id}(id=${course.id})}" method="post" 
+                                          onsubmit="return confirm('정말 삭제하시겠습니까?')" style="display: inline;">
+                                        <button type="submit" class="dropdown-item text-danger">삭제</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 강의가 없을 때 -->
+            <div th:if="${#lists.isEmpty(courses)}" class="empty-state">
+                <div class="empty-icon">📚</div>
+                <h3>등록된 강의가 없습니다</h3>
+                <p>첫 번째 강의를 등록해보세요!</p>
+                <a href="/course/add" class="btn btn-primary">강의 등록하기</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function filterCourses(status) {
+            const courses = document.querySelectorAll('.course-card');
+            const tabs = document.querySelectorAll('.filter-tab');
+            
+            // 탭 활성화
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // 강의 필터링
+            courses.forEach(course => {
+                if (status === 'all' || course.dataset.status === status) {
+                    course.style.display = 'block';
+                } else {
+                    course.style.display = 'none';
+                }
+            });
+        }
+        
+        // 드롭다운 메뉴
+        document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                const menu = this.nextElementSibling;
+                menu.classList.toggle('show');
+            });
+        });
+        
+        // 드롭다운 외부 클릭 시 닫기
+        document.addEventListener('click', function(e) {
+            if (!e.target.matches('.dropdown-toggle')) {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kopo.learning.student.myclassroom.EnrollmentMapper">
+    
+    <resultMap id="EnrollmentResultMap" type="com.kopo.learning.common.vo.Enrollment">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="courseId" column="course_id"/>
+        <result property="status" column="status"/>
+        <result property="progress" column="progress"/>
+        <result property="enrolledAt" column="enrolled_at"/>
+        <result property="startedAt" column="started_at"/>
+        <result property="completedAt" column="completed_at"/>
+        <result property="lastAccessedAt" column="last_accessed_at"/>
+        <result property="courseName" column="course_name"/>
+        <result property="teacherName" column="teacher_name"/>
+        <result property="thumbnailUrl" column="thumbnail_url"/>
+        <result property="category" column="category"/>
+    </resultMap>
+    
+    <!-- 사용자의 모든 수강 정보 조회 -->
+    <select id="findByUserId" resultMap="EnrollmentResultMap">
+        SELECT 
+            e.id,
+            e.user_id,
+            e.course_id,
+            e.status,
+            e.progress,
+            e.enrolled_at,
+            e.started_at,
+            e.completed_at,
+            e.last_accessed_at,
+            c.course_name,
+            c.teacher_name,
+            c.thumbnail_url,
+            c.category
+        FROM enrollments e
+        LEFT JOIN kmooc_courses c ON e.course_id = c.id
+        WHERE e.user_id = #{userId}
+        ORDER BY e.enrolled_at DESC
+    </select>
+    
+    <!-- 사용자의 특정 상태 수강 정보 조회 -->
+    <select id="findByUserIdAndStatus" resultMap="EnrollmentResultMap">
+        SELECT 
+            e.id,
+            e.user_id,
+            e.course_id,
+            e.status,
+            e.progress,
+            e.enrolled_at,
+            e.started_at,
+            e.completed_at,
+            e.last_accessed_at,
+            c.course_name,
+            c.teacher_name,
+            c.thumbnail_url,
+            c.category
+        FROM enrollments e
+        LEFT JOIN kmooc_courses c ON e.course_id = c.id
+        WHERE e.user_id = #{userId} AND e.status = #{status}
+        ORDER BY e.enrolled_at DESC
+    </select>
+    
+    <!-- 특정 강의 수강 여부 확인 -->
+    <select id="findByUserIdAndCourseId" resultMap="EnrollmentResultMap">
+        SELECT 
+            e.id,
+            e.user_id,
+            e.course_id,
+            e.status,
+            e.progress,
+            e.enrolled_at,
+            e.started_at,
+            e.completed_at,
+            e.last_accessed_at,
+            c.course_name,
+            c.teacher_name,
+            c.thumbnail_url,
+            c.category
+        FROM enrollments e
+        LEFT JOIN kmooc_courses c ON e.course_id = c.id
+        WHERE e.user_id = #{userId} AND e.course_id = #{courseId}
+    </select>
+    
+    <!-- 수강 신청 -->
+    <insert id="save" parameterType="com.kopo.learning.common.vo.Enrollment" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO enrollments (
+            user_id,
+            course_id,
+            status,
+            progress,
+            enrolled_at,
+            started_at,
+            completed_at,
+            last_accessed_at
+        ) VALUES (
+            #{userId},
+            #{courseId},
+            #{status},
+            #{progress},
+            #{enrolledAt},
+            #{startedAt},
+            #{completedAt},
+            #{lastAccessedAt}
+        )
+    </insert>
+    
+    <!-- 수강 정보 업데이트 -->
+    <update id="update" parameterType="com.kopo.learning.common.vo.Enrollment">
+        UPDATE enrollments SET
+            status = #{status},
+            progress = #{progress},
+            started_at = #{startedAt},
+            completed_at = #{completedAt},
+            last_accessed_at = #{lastAccessedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 진행률 업데이트 -->
+    <update id="updateProgress">
+        UPDATE enrollments SET
+            progress = #{progress},
+            last_accessed_at = NOW()
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 상태 업데이트 -->
+    <update id="updateStatus">
+        UPDATE enrollments SET
+            status = #{status},
+            last_accessed_at = NOW()
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 마지막 접속 시간 업데이트 -->
+    <update id="updateLastAccessedAt">
+        UPDATE enrollments SET
+            last_accessed_at = NOW()
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 수강 정보 삭제 -->
+    <delete id="delete">
+        DELETE FROM enrollments WHERE id = #{id}
+    </delete>
+    
+</mapper> 

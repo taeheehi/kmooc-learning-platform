@@ -1,1 +1,145 @@
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>수강자 확인</title><link rel="stylesheet" href="/css/instructor/course_students.css"></head><body><h1>수강자 확인 페이지</h1></body></html> 
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>수강생 관리</title>
+    <link rel="stylesheet" href="/css/instructor/course_students.css">
+</head>
+<body>
+    <!-- 공통 헤더 -->
+    <div th:replace="~{common/header :: header}"></div>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1 th:text="${#authentication != null and #authentication.principal != null and #strings.equals(#authentication.principal.role, 'ADMIN') ? '전체 수강생 관리' : '수강생 관리'}">수강생 관리</h1>
+            <p th:text="${#authentication != null and #authentication.principal != null and #strings.equals(#authentication.principal.role, 'ADMIN') ? '시스템의 모든 강의별 수강생 현황과 통계를 확인하세요' : '강의별 수강생 현황과 통계를 확인하세요'}">강의별 수강생 현황과 통계를 확인하세요</p>
+        </div>
+        
+        <!-- 전체 통계 -->
+        <div class="overall-stats">
+            <div class="stat-summary">
+                <div class="stat-item">
+                    <div class="stat-number" th:text="${#lists.size(courses)}">0</div>
+                    <div class="stat-label" th:text="${#authentication != null and #authentication.principal != null and #strings.equals(#authentication.principal.role, 'ADMIN') ? '전체 강의' : '등록 강의'}">등록 강의</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">
+                        <span th:text="${totalStudents}">0</span>
+                    </div>
+                    <div class="stat-label">총 수강생</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">
+                        <span th:text="${#numbers.formatDecimal(avgRating, 1, 1)}">0.0</span>
+                    </div>
+                    <div class="stat-label">평균 평점</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 강의별 수강생 현황 -->
+        <div class="course-enrollments">
+            <h2 th:text="${#authentication != null and #authentication.principal != null and #strings.equals(#authentication.principal.role, 'ADMIN') ? '전체 강의별 수강생 현황' : '강의별 수강생 현황'}">강의별 수강생 현황</h2>
+            
+            <div class="course-list">
+                <div th:each="course : ${courses}" class="course-enrollment-card">
+                    <div class="course-header">
+                        <div class="course-info">
+                            <h3 class="course-title" th:text="${course.courseName}">강의명</h3>
+                            <p class="course-category" th:text="${course.category}">카테고리</p>
+                            <div class="course-status" th:class="${course.status == 'PUBLISHED' ? 'status-published' : 'status-draft'}">
+                                <span th:text="${course.status == 'PUBLISHED' ? '공개' : '임시저장'}">상태</span>
+                            </div>
+                        </div>
+                        <div class="course-thumbnail">
+                            <img th:src="${course.thumbnailUrl}" alt="강의 썸네일" 
+                                 onerror="this.src='/images/no-image.png';">
+                        </div>
+                    </div>
+                    
+                    <div class="enrollment-stats">
+                        <div class="stat-grid">
+                            <div class="stat-box">
+                                <div class="stat-icon">👥</div>
+                                <div class="stat-content">
+                                    <div class="stat-number" th:text="${course.enrollmentCount != null ? course.enrollmentCount : 0}">0</div>
+                                    <div class="stat-label">수강생</div>
+                                </div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-icon">⭐</div>
+                                <div class="stat-content">
+                                    <div class="stat-number" th:text="${course.averageRating != null ? course.averageRating : '0.0'}">0.0</div>
+                                    <div class="stat-label">평점</div>
+                                </div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-icon">💬</div>
+                                <div class="stat-content">
+                                    <div class="stat-number" th:text="${course.reviewCount != null ? course.reviewCount : 0}">0</div>
+                                    <div class="stat-label">리뷰</div>
+                                </div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-icon">📅</div>
+                                <div class="stat-content">
+                                    <div class="stat-number" th:text="${course.totalWeeks + '주'}">12주</div>
+                                    <div class="stat-label">기간</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="course-actions">
+                        <a th:href="@{/course/students/{id}(id=${course.id})}" class="btn btn-primary">
+                            수강생 상세보기
+                        </a>
+                        <a th:href="@{/course/edit/{id}(id=${course.id})}" class="btn btn-outline">
+                            강의 수정
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 강의가 없을 때 -->
+            <div th:if="${#lists.isEmpty(courses)}" class="empty-state">
+                <div class="empty-icon">👥</div>
+                <h3 th:text="${#authentication != null and #authentication.principal != null and #strings.equals(#authentication.principal.role, 'ADMIN') ? '등록된 강의가 없습니다' : '등록된 강의가 없습니다'}">등록된 강의가 없습니다</h3>
+                <p th:text="${#authentication != null and #authentication.principal != null and #strings.equals(#authentication.principal.role, 'ADMIN') ? '시스템에 등록된 강의가 없습니다' : '강의를 등록하면 수강생 현황을 확인할 수 있습니다'}">강의를 등록하면 수강생 현황을 확인할 수 있습니다</p>
+                <a href="/course/add" class="btn btn-primary">강의 등록하기</a>
+            </div>
+        </div>
+        
+        <!-- 최근 활동 -->
+        <div class="recent-activity">
+            <h2>최근 활동</h2>
+            <div class="activity-list">
+                <div class="activity-item">
+                    <div class="activity-icon">📈</div>
+                    <div class="activity-content">
+                        <div class="activity-title">새로운 수강생 등록</div>
+                        <div class="activity-desc">파이썬 기초 프로그래밍에 새로운 수강생이 등록했습니다</div>
+                        <div class="activity-time">2시간 전</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">⭐</div>
+                    <div class="activity-content">
+                        <div class="activity-title">새로운 리뷰</div>
+                        <div class="activity-desc">웹 개발 기초 강의에 5점 리뷰가 등록되었습니다</div>
+                        <div class="activity-time">5시간 전</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">✅</div>
+                    <div class="activity-content">
+                        <div class="activity-title">강의 완료</div>
+                        <div class="activity-desc">데이터 분석 입문 강의를 수강생이 완료했습니다</div>
+                        <div class="activity-time">1일 전</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

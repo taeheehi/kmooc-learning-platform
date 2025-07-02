@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kopo.learning.student.myclassroom.LearningRoadmapMapper">
+    
+    <resultMap id="LearningRoadmapResultMap" type="com.kopo.learning.common.vo.LearningRoadmap">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="roadmapName" column="roadmap_name"/>
+        <result property="description" column="description"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="stepId" column="step_id"/>
+        <result property="stepOrder" column="step_order"/>
+        <result property="courseId" column="course_id"/>
+        <result property="stepStatus" column="step_status"/>
+        <result property="courseName" column="course_name"/>
+        <result property="teacherName" column="teacher_name"/>
+        <result property="thumbnailUrl" column="thumbnail_url"/>
+        <result property="category" column="category"/>
+    </resultMap>
+    
+    <!-- 사용자의 활성 로드맵 조회 -->
+    <select id="findActiveRoadmapByUserId" resultMap="LearningRoadmapResultMap">
+        SELECT 
+            r.id,
+            r.user_id,
+            r.roadmap_name,
+            r.description,
+            r.status,
+            r.created_at,
+            r.updated_at,
+            rs.id as step_id,
+            rs.step_order,
+            rs.course_id,
+            rs.step_status,
+            c.course_name,
+            c.teacher_name,
+            c.thumbnail_url,
+            c.category
+        FROM learning_roadmaps r
+        LEFT JOIN roadmap_steps rs ON r.id = rs.roadmap_id
+        LEFT JOIN kmooc_courses c ON rs.course_id = c.id
+        WHERE r.user_id = #{userId} AND r.status = 'ACTIVE'
+        ORDER BY rs.step_order ASC
+    </select>
+    
+    <!-- 사용자의 모든 로드맵 조회 -->
+    <select id="findAllByUserId" resultMap="LearningRoadmapResultMap">
+        SELECT 
+            r.id,
+            r.user_id,
+            r.roadmap_name,
+            r.description,
+            r.status,
+            r.created_at,
+            r.updated_at
+        FROM learning_roadmaps r
+        WHERE r.user_id = #{userId}
+        ORDER BY r.created_at DESC
+    </select>
+    
+    <!-- 로드맵 단계별 상태 조회 -->
+    <select id="findRoadmapSteps" resultMap="LearningRoadmapResultMap">
+        SELECT 
+            rs.id as step_id,
+            rs.step_order,
+            rs.course_id,
+            rs.step_status,
+            c.course_name,
+            c.teacher_name,
+            c.thumbnail_url,
+            c.category
+        FROM roadmap_steps rs
+        LEFT JOIN kmooc_courses c ON rs.course_id = c.id
+        WHERE rs.roadmap_id = #{roadmapId}
+        ORDER BY rs.step_order ASC
+    </select>
+    
+    <!-- 로드맵 생성 -->
+    <insert id="saveRoadmap" parameterType="com.kopo.learning.common.vo.LearningRoadmap" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO learning_roadmaps (
+            user_id,
+            roadmap_name,
+            description,
+            status,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{userId},
+            #{roadmapName},
+            #{description},
+            #{status},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+    
+    <!-- 로드맵 단계 생성 -->
+    <insert id="saveRoadmapStep" parameterType="com.kopo.learning.common.vo.LearningRoadmap" useGeneratedKeys="true" keyProperty="stepId">
+        INSERT INTO roadmap_steps (
+            roadmap_id,
+            step_order,
+            course_id,
+            step_status
+        ) VALUES (
+            #{id},
+            #{stepOrder},
+            #{courseId},
+            #{stepStatus}
+        )
+    </insert>
+    
+    <!-- 로드맵 업데이트 -->
+    <update id="updateRoadmap" parameterType="com.kopo.learning.common.vo.LearningRoadmap">
+        UPDATE learning_roadmaps SET
+            roadmap_name = #{roadmapName},
+            description = #{description},
+            status = #{status},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 로드맵 단계 업데이트 -->
+    <update id="updateRoadmapStep" parameterType="com.kopo.learning.common.vo.LearningRoadmap">
+        UPDATE roadmap_steps SET
+            step_status = #{stepStatus}
+        WHERE id = #{stepId}
+    </update>
+    
+    <!-- 로드맵 삭제 -->
+    <delete id="deleteRoadmap">
+        DELETE FROM learning_roadmaps WHERE id = #{id}
+    </delete>
+    
+    <!-- 로드맵 단계 삭제 -->
+    <delete id="deleteRoadmapSteps">
+        DELETE FROM roadmap_steps WHERE roadmap_id = #{roadmapId}
+    </delete>
+    
+</mapper> 
