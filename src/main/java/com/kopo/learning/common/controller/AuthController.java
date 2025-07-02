@@ -57,8 +57,8 @@ public class AuthController {
                                @RequestParam String password,
                                @RequestParam String passwordCheck,
                                @RequestParam String role,
-                               @RequestParam(required = false) String phone,
-                               @RequestParam(required = false) String email,
+                               @RequestParam String phone,
+                               @RequestParam String email,
                                @RequestParam(required = false) String gender,
                                @RequestParam(required = false) String birth,
                                Model model) {
@@ -70,11 +70,19 @@ public class AuthController {
             model.addAttribute("msg", "이미 존재하는 아이디입니다.");
             return "common/register";
         }
-        if (phone != null && userService.loginUser(null, null) != null) {
+        if (phone == null || phone.trim().isEmpty()) {
+            model.addAttribute("msg", "핸드폰번호는 필수 입력입니다.");
+            return "common/register";
+        }
+        if (email == null || email.trim().isEmpty()) {
+            model.addAttribute("msg", "이메일은 필수 입력입니다.");
+            return "common/register";
+        }
+        if (userMapper.existsByPhone(phone)) {
             model.addAttribute("msg", "이미 등록된 핸드폰 번호입니다.");
             return "common/register";
         }
-        if (email != null && userService.loginUser(null, null) != null) {
+        if (userMapper.existsByEmail(email)) {
             model.addAttribute("msg", "이미 등록된 이메일입니다.");
             return "common/register";
         }
