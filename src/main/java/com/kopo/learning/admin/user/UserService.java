@@ -16,7 +16,7 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
-    // ✅ 비밀번호 인코더
+    // 비밀번호 인코더
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     /**
@@ -24,6 +24,11 @@ public class UserService {
      */
     public User registerUser(String id, String name, String password, String role,
                              String phone, String email, String gender, String birth) {
+
+        // 아이디 중복 체크
+        if (userMapper.findById(id) != null) {
+            throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
+        }
 
         String phoneNormalized = (phone == null) ? null : phone.replaceAll("-", "");
 
@@ -41,7 +46,7 @@ public class UserService {
             phoneFormatted = phoneNormalized.replaceFirst("(\\d{3})(\\d{4})(\\d{4})", "$1-$2-$3");
         }
 
-        // ✅ 비밀번호 해시
+        // 비밀번호 해시
         String hashedPassword = passwordEncoder.encode(password);
 
         User user = new User();
@@ -85,7 +90,7 @@ public class UserService {
             }
         }
 
-        // ✅ 비밀번호 매칭
+        // 비밀번호 매칭
         if (passwordEncoder.matches(password, user.getPassword())) {
             // 로그인 성공
             user.setLoginFailCount(0);
@@ -114,7 +119,7 @@ public class UserService {
     public User updateUser(User user, String name, String oldPassword, String newPassword,
                            String phone, String email, String gender, String birth) {
 
-        // ✅ 기존 비밀번호 확인
+        // 기존 비밀번호 확인
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             return null; // 기존 비밀번호 불일치
         }
@@ -129,7 +134,7 @@ public class UserService {
             user.setBirth(LocalDate.parse(birth));
         }
 
-        // ✅ 새 비밀번호 변경 시 해시
+        // 새 비밀번호 변경 시 해시
         if (newPassword != null && !newPassword.isEmpty()) {
             user.setPassword(passwordEncoder.encode(newPassword));
         }

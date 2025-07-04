@@ -86,7 +86,12 @@ public class AuthController {
             model.addAttribute("msg", "이미 등록된 이메일입니다.");
             return "common/register";
         }
-        userService.registerUser(id, name, password, role, phone, email, gender, birth);
+        try {
+            userService.registerUser(id, name, password, role, phone, email, gender, birth);
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("msg", e.getMessage());
+            return "common/register";
+        }
         return "redirect:/login";
     }
 
