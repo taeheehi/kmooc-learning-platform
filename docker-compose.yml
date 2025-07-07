@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:8.4
+    container_name: kmooc-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: learningdb
+      MYSQL_USER: kopouser
+      MYSQL_PASSWORD: kopouser
+      MYSQL_ROOT_PASSWORD: root
+      TZ: Asia/Seoul
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+  app:
+    build: .
+    container_name: kmooc-app
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/learningdb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: kopouser
+      SPRING_DATASOURCE_PASSWORD: kopouser
+volumes:
+  db_data: 
